@@ -37,6 +37,11 @@ public class Professeur {
             encoderEtudiant = conn.prepareStatement("SELECT projet.encoder_etudiant (?,?,?,?,?)");
             encoderEntreprise = conn.prepareStatement("SELECT projet.encoder_entreprise (?,?,?,?,?)");
             encoderMotCle = conn.prepareStatement("SELECT projet.encoder_mot_cle (?)");
+            voirOffreStage = conn.prepareStatement("SELECT * FROM projet.get_offres_non_validees");
+            validerOffreStage = conn.prepareStatement("SELECT projet.valider_offre_stage(?)");
+            voirOffreStageValidee = conn.prepareStatement("SELECT * FROM projet.get_offres_validees");
+            voirEtudiantSansStage = conn.prepareStatement("SELECT * FROM projet.voir_etudiant_sans_stage");
+            voirOffreStageAttribuee = conn.prepareStatement("SELECT * FROM projet.voir_offre_stage_attribue");
         } catch (SQLException e) {
             System.out.println("Erreur !");
             System.exit(1);
