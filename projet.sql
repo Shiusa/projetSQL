@@ -159,7 +159,7 @@ CREATE OR REPLACE FUNCTION valider_offre_stage_trigger()
 RETURNS TRIGGER
 AS $$
 BEGIN
-    IF (NEW.etat <> (SELECT etat FROM projet.etats WHERE etat = 'validée'))
+    IF (NEW.etat <> (SELECT etat FROM projet.etats WHERE etat = 'non validée'))
     THEN
         RAISE 'ce stage ne peut pas etre validée';
     end if;
