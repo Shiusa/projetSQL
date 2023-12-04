@@ -174,11 +174,10 @@ EXECUTE PROCEDURE valider_offre_stage_trigger ();
 
 --professeur Q6
 CREATE OR REPLACE VIEW projet.get_offres_validees AS
-    SELECT os.code, os.semestre, e.nom AS entreprise_nom, et.etat AS description_etat
-    FROM projet.offres_stage os
-    JOIN projet.etats et ON os.etat = et.id_etat
-    JOIN projet.entreprise e ON os.entreprise = e.id_entreprise
-    WHERE et.etat = 'validée';
+    SELECT os.code, os.semestre, en.nom AS entreprise_nom, os.description
+    FROM projet.offres_stage os, projet.etats et, projet.entreprise en
+    WHERE(os.entreprise = en.id_entreprise AND os.etat = et.id_etat)
+    AND(et.etat = 'validée');
 
 
 --professeur Q7
