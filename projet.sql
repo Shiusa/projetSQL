@@ -51,7 +51,7 @@ CREATE TABLE projet.offres_stage (
 
 CREATE TABLE projet.candidatures (
     offre_stage INTEGER REFERENCES projet.offres_stage(id_offre_stage) NOT NULL,
-    code_offre_stage VARCHAR(5) NOT NULL UNIQUE CHECK ( code_offre_stage SIMILAR TO (candidatures.offre_stage || '\d')),
+    code_offre_stage VARCHAR(5) NOT NULL UNIQUE,
     etudiant INTEGER REFERENCES projet.etudiants(id_etudiant) NOT NULL,
     CONSTRAINT candidatures_pk PRIMARY KEY (offre_stage, etudiant),
     etat INTEGER REFERENCES projet.etats(id_etat) NOT NULL,
@@ -149,13 +149,19 @@ CREATE OR REPLACE FUNCTION projet.valider_offre_stage(_code VARCHAR(5))
 RETURNS VOID
 AS $$
 BEGIN
+
+    IF ((SELECT os.etat FROM projet.offres_stage os WHERE os.code = _code) <> (SELECT id_etat FROM projet.etats WHERE etat = 'non validée'))
+    THEN
+        RAISE 'ce stage ne peut pas etre validée';
+    END IF;
+
     UPDATE projet.offres_stage
     SET etat = (SELECT id_etat FROM projet.etats WHERE etat = 'validée')
     WHERE code = _code;
 end;
 $$ LANGUAGE plpgsql;
 
-CREATE OR REPLACE FUNCTION valider_offre_stage_trigger()
+/*CREATE OR REPLACE FUNCTION valider_offre_stage_trigger()
 RETURNS TRIGGER
 AS $$
 BEGIN
@@ -169,7 +175,7 @@ $$ LANGUAGE plpgsql;
 
 CREATE TRIGGER valider_offre_stage_trigger BEFORE UPDATE ON projet.offres_stage
 FOR EACH ROW
-EXECUTE PROCEDURE valider_offre_stage_trigger ();
+EXECUTE PROCEDURE valider_offre_stage_trigger ();*/
 
 
 --professeur Q6
@@ -635,6 +641,12 @@ BEGIN
     SELECT et.id_etat FROM projet.etats et WHERE (et.etat = 'acceptée') INTO etat_acceptee_id;
     SELECT et.id_etat FROM projet.etats et WHERE (et.etat = 'validée') INTO etat_validee_id;
     SELECT et.semestre FROM projet.etudiants et WHERE (et.id_etudiant = NEW.etudiant) INTO semestre_var;
+    IF NOT EXISTS(
+        SELECT os.* FROM projet.offres_stage os
+        WHERE (os.code = NEW.code_offre_stage)
+        )
+        THEN RAISE 'Offre stage inexistante';
+    END IF;
     IF EXISTS (
         SELECT ca.* FROM projet.candidatures ca
         WHERE (ca.etudiant = NEW.etudiant)
@@ -660,7 +672,7 @@ BEGIN
         ) <> semestre_var
         THEN RAISE 'Mauvais semestre';
     END IF;
-
+    RETURN NEW;
 end;
 $$ LANGUAGE plpgsql;
 

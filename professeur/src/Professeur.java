@@ -246,7 +246,23 @@ public class Professeur {
     }
 
     private void voirEtudiantsSansStage() {
+
         System.out.println("Voir les étudiants qui n'ont pas de stage");
+
+        try(ResultSet rs = voirEtudiantSansStage.executeQuery()) {
+            while (rs.next()) {
+                System.out.println(
+                        "\nNom: " + rs.getString(1) + "\n"
+                                +"Prénom: " + rs.getString(2) + "\n"
+                                +"Email: " + rs.getString(3) + "\n"
+                                +"Semestre: " + rs.getString(4) +"\n"
+                                +"Nb candidature en attente: " + rs.getString(5) +"\n"
+                );
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
     private void voirOffreAttribuee() {
