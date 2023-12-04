@@ -170,10 +170,24 @@ public class Professeur {
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
+
     }
 
     private void encoderMotCle() {
-        System.out.println("Encoder un mot clé");
+
+        String motCle;
+
+        System.out.println("Encoder un mot-clé");
+        System.out.println("Mot-clé: ");
+        motCle = scanner.nextLine();
+
+        try {
+            encoderMotCle.setString(1,motCle);
+            encoderMotCle.executeQuery();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
     private void voirOffreInvalide() {

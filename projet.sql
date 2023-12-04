@@ -127,6 +127,7 @@ BEGIN
     IF EXISTS(SELECT mot FROM projet.mots_cles WHERE mot = NEW.mot)
         THEN RAISE 'Mot clé déjà présent';
     END IF;
+    RETURN NEW;
 end;
 $$ LANGUAGE plpgsql;
 
