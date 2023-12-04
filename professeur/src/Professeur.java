@@ -103,9 +103,11 @@ public class Professeur {
     }
 
     public void encoderEtudiant() {
-        System.out.println("Encoder un étudiant");
+
         String nom, prenom, mail, mdp;
         Semestre semestre = null;
+
+        System.out.println("Encoder un étudiant");
         System.out.println("Nom: ");
         //scanner.next();
         nom = scanner.nextLine();
@@ -142,7 +144,32 @@ public class Professeur {
     }
 
     public void encoderEntreprise() {
+
+        String nom, adresse, mail, identifiant, mdp;
+
         System.out.println("Encoder une entreprise");
+        System.out.println("Nom: ");
+        nom = scanner.nextLine();
+        System.out.println("Adresse: ");
+        adresse = scanner.nextLine();
+        System.out.println("Mail: ");
+        mail = scanner.nextLine();
+        System.out.println("Identifiant (3 lettres majuscule): ");
+        identifiant = scanner.nextLine();
+
+        System.out.println("Mot de passe: ");
+        mdp = BCrypt.hashpw(scanner.nextLine(),salt);
+
+        try {
+            encoderEntreprise.setString(1,nom);
+            encoderEntreprise.setString(2,adresse);
+            encoderEntreprise.setString(3,mail);
+            encoderEntreprise.setString(4,identifiant);
+            encoderEntreprise.setString(5,mdp);
+            encoderEntreprise.executeQuery();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
     }
 
     private void encoderMotCle() {
