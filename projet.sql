@@ -203,7 +203,7 @@ CREATE OR REPLACE VIEW projet.voir_offre_stage_attribue AS
     SELECT os.code, en.nom as "nom entreprise", et.nom as "nom etudiant", et.prenom
     FROM projet.offres_stage os, projet.entreprise en, projet.etudiants et
     WHERE (os.entreprise = en.id_entreprise AND os.etudiant = et.id_etudiant)
-    AND (os.etat = (SELECT id_etat FROM projet.etats WHERE etat = 'attribué'));
+    AND (os.etat = (SELECT id_etat FROM projet.etats WHERE etat = 'attribuée'));
 
 
 

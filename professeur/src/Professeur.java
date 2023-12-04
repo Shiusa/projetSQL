@@ -266,7 +266,22 @@ public class Professeur {
     }
 
     private void voirOffreAttribuee() {
+
         System.out.println("Voir les offres de stage dans l'état \"attribuée\"");
+
+        try(ResultSet rs = voirOffreStageAttribuee.executeQuery()) {
+            while (rs.next()) {
+                System.out.println(
+                        "\nCode: " + rs.getString(1) + "\n"
+                                +"Nom de l'entreprise: " + rs.getString(2) + "\n"
+                                +"Nom de l'étudiant: " + rs.getString(3) + "\n"
+                                +"Prénom de l'étudiant: " + rs.getString(4) +"\n"
+                );
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
 }
