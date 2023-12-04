@@ -1,13 +1,12 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Professeur {
 
     private Scanner scanner = new Scanner(System.in);
+
+    private String salt = BCrypt.gensalt();
 
     private Connection conn = null;
     private PreparedStatement encoderEtudiant;
@@ -70,6 +69,7 @@ public class Professeur {
 
             try {
                 option = scanner.nextInt();
+                scanner.nextLine();
             } catch (InputMismatchException e) {
                 scanner.next();
                 System.out.println("Entrer un entier!");
@@ -104,6 +104,41 @@ public class Professeur {
 
     public void encoderEtudiant() {
         System.out.println("Encoder un étudiant");
+        String nom, prenom, mail, mdp;
+        Semestre semestre = null;
+        System.out.println("Nom: ");
+        //scanner.next();
+        nom = scanner.nextLine();
+        System.out.println("Prénom: ");
+        prenom = scanner.nextLine();
+        System.out.println("Mail (@student.vinci.be): ");
+        mail = scanner.nextLine();
+        System.out.println("Semestre (\"Q1\",\"Q2\"): ");
+        while (semestre == null) {
+            try {
+                semestre = Semestre.valueOf(scanner.nextLine());
+                //System.out.println("semestre est "+semestre);
+                //semestreString = scanner.nextLine();
+            } catch (IllegalArgumentException e) {
+                System.out.println("Semestre inexistant, entrer a nouveau le semestre");
+                System.out.println("Semestre (\"Q1\",\"Q2\"): ");
+            }
+        }
+
+        System.out.println("Mot de passe: ");
+        mdp = BCrypt.hashpw(scanner.nextLine(),salt);
+
+        try {
+            encoderEtudiant.setString(1,nom);
+            encoderEtudiant.setString(2,prenom);
+            encoderEtudiant.setString(3,mail);
+            encoderEtudiant.setObject(4, semestre, Types.OTHER);
+            encoderEtudiant.setString(5,mdp);
+            encoderEtudiant.executeQuery();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
     public void encoderEntreprise() {
