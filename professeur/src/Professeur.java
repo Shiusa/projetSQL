@@ -191,7 +191,22 @@ public class Professeur {
     }
 
     private void voirOffreInvalide() {
+
         System.out.println("Voir les offres de stage dans l'état \"non validée\"");
+
+        try(ResultSet rs = voirOffreStage.executeQuery()) {
+            while (rs.next()) {
+                System.out.println(
+                        "\nCode: " + rs.getString(1) + "\n"
+                        +"Semestre: " + rs.getString(2) + "\n"
+                        +"Nom entreprise: " + rs.getString(3) + "\n"
+                        +"Description: " + rs.getString(4) +"\n"
+                );
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
     private void validerOffre() {

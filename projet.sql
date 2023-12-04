@@ -138,11 +138,10 @@ EXECUTE PROCEDURE encoder_mot_cle_trigger();
 
 --professeur Q4
 CREATE OR REPLACE VIEW projet.get_offres_non_validees AS
-    SELECT os.code, os.semestre, e.nom AS entreprise_nom, et.etat AS description_etat
-    FROM projet.offres_stage os
-    JOIN projet.etats et ON os.etat = et.id_etat
-    JOIN projet.entreprise e ON os.entreprise = e.id_entreprise
-    WHERE et.etat = 'non validée';
+    SELECT os.code, os.semestre, en.nom AS entreprise_nom, os.description
+    FROM projet.offres_stage os, projet.etats et, projet.entreprise en
+    WHERE(os.entreprise = en.id_entreprise AND os.etat = et.id_etat)
+    AND(et.etat = 'non validée');
 
 
 --professeur Q5
@@ -209,6 +208,7 @@ RETURNS VOID AS $$
 DECLARE
     numero_code INTEGER;
     etat_defaut INTEGER;
+    code_offre  VARCHAR(5);
 BEGIN
     /*IF EXISTS (
         SELECT os.* FROM projet.offres_stage os
@@ -218,10 +218,11 @@ BEGIN
         THEN RAISE 'Offre de stage déjà attribuée durant ce semestre';
     END IF;*/
 
-    SELECT MAX(os.id_offre_stage)+1 FROM projet.offres_stage os WHERE (os.entreprise = _entreprise) INTO numero_code;
+    SELECT count(os.id_offre_stage)+1 FROM projet.offres_stage os WHERE (os.entreprise = _entreprise) INTO numero_code;
     SELECT et.id_etat FROM projet.etats et WHERE et.etat = 'non validée' INTO etat_defaut;
+    code_offre:= concat(_entreprise,numero_code);
 
-    INSERT INTO projet.offres_stage(code, entreprise, etat, semestre, description) VALUES (_entreprise+numero_code, _entreprise, etat_defaut, _semestre, _description);
+    INSERT INTO projet.offres_stage(code, entreprise, etat, semestre, description) VALUES (code_offre, _entreprise, etat_defaut, _semestre, _description);
 end;
 $$ LANGUAGE plpgsql;
 
@@ -233,9 +234,10 @@ BEGIN
         SELECT os.* FROM projet.offres_stage os
         WHERE (os.entreprise = NEW.entreprise)
         AND(os.semestre = NEW.semestre)
-        AND (os.etat = (SELECT etat FROM projet.etats WHERE etats.etat = 'attribuée')))
+        AND (os.etat = (SELECT id_etat FROM projet.etats WHERE etats.etat = 'attribuée')))
         THEN RAISE 'Offre de stage déjà attribuée durant ce semestre';
     END IF;
+    RETURN NEW;
 end;
 $$ LANGUAGE plpgsql;
 
