@@ -234,9 +234,9 @@ public class Professeur {
             while (rs.next()) {
                 System.out.println(
                         "\nCode: " + rs.getString(1) + "\n"
-                                +"Semestre: " + rs.getString(2) + "\n"
-                                +"Nom entreprise: " + rs.getString(3) + "\n"
-                                +"Description: " + rs.getString(4) +"\n"
+                        +"Semestre: " + rs.getString(2) + "\n"
+                        +"Nom entreprise: " + rs.getString(3) + "\n"
+                        +"Description: " + rs.getString(4) +"\n"
                 );
             }
         } catch (SQLException throwables) {
@@ -253,10 +253,10 @@ public class Professeur {
             while (rs.next()) {
                 System.out.println(
                         "\nNom: " + rs.getString(1) + "\n"
-                                +"Prénom: " + rs.getString(2) + "\n"
-                                +"Email: " + rs.getString(3) + "\n"
-                                +"Semestre: " + rs.getString(4) +"\n"
-                                +"Nb candidature en attente: " + rs.getString(5) +"\n"
+                        +"Prénom: " + rs.getString(2) + "\n"
+                        +"Email: " + rs.getString(3) + "\n"
+                        +"Semestre: " + rs.getString(4) +"\n"
+                        +"Nb candidature en attente: " + rs.getString(5) +"\n"
                 );
             }
         } catch (SQLException throwables) {
@@ -273,9 +273,9 @@ public class Professeur {
             while (rs.next()) {
                 System.out.println(
                         "\nCode: " + rs.getString(1) + "\n"
-                                +"Nom de l'entreprise: " + rs.getString(2) + "\n"
-                                +"Nom de l'étudiant: " + rs.getString(3) + "\n"
-                                +"Prénom de l'étudiant: " + rs.getString(4) +"\n"
+                        +"Nom de l'entreprise: " + rs.getString(2) + "\n"
+                        +"Nom de l'étudiant: " + rs.getString(3) + "\n"
+                        +"Prénom de l'étudiant: " + rs.getString(4) +"\n"
                 );
             }
         } catch (SQLException throwables) {
