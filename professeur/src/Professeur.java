@@ -210,7 +210,20 @@ public class Professeur {
     }
 
     private void validerOffre() {
+
+        String codeOffreStage;
+
         System.out.println("Valider une offre de stage en donnant son code");
+        System.out.println("Code offre stage: ");
+        codeOffreStage = scanner.nextLine();
+
+        try {
+            validerOffreStage.setString(1,codeOffreStage);
+            validerOffreStage.executeQuery();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
     private void voirOffreValidee() {

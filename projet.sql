@@ -150,7 +150,7 @@ RETURNS VOID
 AS $$
 BEGIN
     UPDATE projet.offres_stage
-    SET etat = (SELECT etat FROM projet.etats WHERE etat = 'validée')
+    SET etat = (SELECT id_etat FROM projet.etats WHERE etat = 'validée')
     WHERE code = _code;
 end;
 $$ LANGUAGE plpgsql;
@@ -159,7 +159,7 @@ CREATE OR REPLACE FUNCTION valider_offre_stage_trigger()
 RETURNS TRIGGER
 AS $$
 BEGIN
-    IF (NEW.etat <> (SELECT etat FROM projet.etats WHERE etat = 'non validée'))
+    IF (OLD.etat <> (SELECT id_etat FROM projet.etats WHERE etat = 'non validée'))
     THEN
         RAISE 'ce stage ne peut pas etre validée';
     end if;
