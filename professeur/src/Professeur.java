@@ -2,8 +2,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.InputMismatchException;
+import java.util.Scanner;
 
 public class Professeur {
+
+    private Scanner scanner = new Scanner(System.in);
 
     private Connection conn = null;
     private PreparedStatement encoderEtudiant;
@@ -49,5 +53,85 @@ public class Professeur {
 
     }
 
+
+    public void start() {
+
+        int option;
+
+        while(true) {
+            System.out.println("1 - Encoder un étudiant");
+            System.out.println("2 - Encoder une entreprise");
+            System.out.println("3 - Encoder un mot-clé");
+            System.out.println("4 - Voir les offres de stage dans l'état \"non validée\"");
+            System.out.println("5 - Valider une offre de stage en donnant son code");
+            System.out.println("6 - Voir les offres de stage dans l'état \"validée\"");
+            System.out.println("7 - Voir les étudiants qui n'ont pas de stage");
+            System.out.println("8 - Voir les offres de stage dans l'état \"attribuée\"");
+
+            try {
+                option = scanner.nextInt();
+            } catch (InputMismatchException e) {
+                scanner.next();
+                System.out.println("Entrer un entier!");
+                continue;
+            }
+            if (option < 1 || option > 8) {
+                System.out.println("Option inexistante");
+                continue;
+            }
+
+            switch (option) {
+                case 1: encoderEtudiant();
+                    break;
+                case 2: encoderEntreprise();
+                    break;
+                case 3: encoderMotCle();
+                    break;
+                case 4: voirOffreInvalide();
+                    break;
+                case 5: validerOffre();
+                    break;
+                case 6: voirOffreValidee();
+                    break;
+                case 7: voirEtudiantsSansStage();
+                    break;
+                case 8: voirOffreAttribuee();
+                    break;
+            }
+        }
+
+    }
+
+    public void encoderEtudiant() {
+        System.out.println("Encoder un étudiant");
+    }
+
+    public void encoderEntreprise() {
+        System.out.println("Encoder une entreprise");
+    }
+
+    private void encoderMotCle() {
+        System.out.println("Encoder un mot clé");
+    }
+
+    private void voirOffreInvalide() {
+        System.out.println("Voir les offres de stage dans l'état \"non validée\"");
+    }
+
+    private void validerOffre() {
+        System.out.println("Valider une offre de stage en donnant son code");
+    }
+
+    private void voirOffreValidee() {
+        System.out.println("Voir les offres de stage dans l'état \"validée\"");
+    }
+
+    private void voirEtudiantsSansStage() {
+        System.out.println("Voir les étudiants qui n'ont pas de stage");
+    }
+
+    private void voirOffreAttribuee() {
+        System.out.println("Voir les offres de stage dans l'état \"attribuée\"");
+    }
 
 }
