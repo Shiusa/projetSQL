@@ -607,12 +607,10 @@ BEGIN
         FOR candidature_offre_annule_rec IN
             SELECT * FROM projet.candidatures
             WHERE (offre_stage = offre_stage_annule_rec.id_offre_stage)
-            AND(etudiant = offre_stage_annule_rec.etudiant)
         LOOP
             UPDATE projet.candidatures
             SET etat = etat_refusee
-            WHERE (offre_stage = candidature_offre_annule_rec.offre_stage)
-            AND(etudiant = candidature_offre_annule_rec.etudiant);
+            WHERE (offre_stage = candidature_offre_annule_rec.offre_stage);
         END LOOP;
 
     END LOOP;
