@@ -57,46 +57,10 @@ public class Entreprise {
 
     public void start() {
 
-        String identifiant, mdp;
-        Boolean connecte = false;
-
         System.out.println("Application Entreprise");
-
         System.out.println("Veuillez vous connecter");
-        System.out.println("Identifiant: ");
-        identifiant = scanner.nextLine();
-        System.out.println("Mot de passe: ");
-        mdp = scanner.nextLine();
-        try {
-            seConnecter.setString(1,identifiant);
-        } catch (SQLException e) {
-            throw new RuntimeException(e);
-        }
 
-        while (!connecte) {
-
-            try(ResultSet rs = seConnecter.executeQuery()) {
-                while (rs.next()) {
-                    if (BCrypt.checkpw(mdp, rs.getString(1))) {
-                        connecte = true;
-                        setIdEntreprise(identifiant);
-                        break;
-                    }
-                }
-                if (!connecte) {
-                    System.out.println("\nMauvais identifiants de connexion");
-                    System.out.println("Identifiant: ");
-                    identifiant = scanner.nextLine();
-                    System.out.println("Mot de passe: ");
-                    mdp = scanner.nextLine();
-                    seConnecter.setString(1,identifiant);
-                }
-            } catch (SQLException e) {
-                throw new RuntimeException(e);
-            }
-        }
-
-
+        seConnecter();
 
         int option;
 
@@ -137,6 +101,46 @@ public class Entreprise {
                     break;
                 case 7: annulerOffreStage();
                     break;
+            }
+        }
+
+    }
+
+    public void seConnecter() {
+
+        String identifiant, mdp;
+        Boolean connecte = false;
+
+        System.out.println("Identifiant: ");
+        identifiant = scanner.nextLine();
+        System.out.println("Mot de passe: ");
+        mdp = scanner.nextLine();
+        try {
+            seConnecter.setString(1,identifiant);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        while (!connecte) {
+
+            try(ResultSet rs = seConnecter.executeQuery()) {
+                while (rs.next()) {
+                    if (BCrypt.checkpw(mdp, rs.getString(1))) {
+                        connecte = true;
+                        setIdEntreprise(identifiant);
+                        break;
+                    }
+                }
+                if (!connecte) {
+                    System.out.println("\nMauvais identifiants de connexion");
+                    System.out.println("Identifiant: ");
+                    identifiant = scanner.nextLine();
+                    System.out.println("Mot de passe: ");
+                    mdp = scanner.nextLine();
+                    seConnecter.setString(1,identifiant);
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
         }
 
