@@ -109,7 +109,7 @@ public class Entreprise {
     public void seConnecter() {
 
         String identifiant, mdp;
-        Boolean connecte = false;
+        boolean connecte = false;
 
         System.out.println("Identifiant: ");
         identifiant = scanner.nextLine();
