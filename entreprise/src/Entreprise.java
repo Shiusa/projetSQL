@@ -42,7 +42,7 @@ public class Entreprise {
         try {
             encoderOffreStage = conn.prepareStatement("SELECT projet.encoder_offre_stage (?,?,?)");
             voirMotsCles = conn.prepareStatement("SELECT * FROM projet.voir_mots_cles");
-            ajouterMotCle = conn.prepareStatement("SELECT projet.ajouter_mot_cle_offre_stage (?,?,?)");
+            ajouterMotCle = conn.prepareStatement("SELECT projet.ajouter_mot_cle_offre_stage (?,?)");
             voirSesOffresStages = conn.prepareStatement("SELECT projet.voir_offres_stages_entreprise (?)");
             voirCandidatures = conn.prepareStatement("SELECT projet.voir_candidatures(?,?)");
             selectionnerEtudiant = conn.prepareStatement("SELECT projet.selectionner_etudiant_offre_stage (?,?,?)");
@@ -194,7 +194,23 @@ public class Entreprise {
     }
 
     public void ajouterMotCle() {
+
+        String codeOffreStage, motCle;
+
         System.out.println("Ajouter un mot-clé à une offre");
+        System.out.println("Code offre stage: ");
+        codeOffreStage = scanner.nextLine();
+        System.out.println("Mot clé: ");
+        motCle = scanner.nextLine();
+
+        try {
+            ajouterMotCle.setString(1,codeOffreStage);
+            ajouterMotCle.setString(2,motCle);
+            ajouterMotCle.executeQuery();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
     public void voirSesOffresStages() {

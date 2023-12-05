@@ -302,6 +302,7 @@ BEGIN
     IF (mot_cle_count >=3)
         THEN RAISE 'L''offre de stage a atteint le nombre maximum de mots-clés (3).';
     END IF;
+    RETURN NEW;
 
 END;
 $$ LANGUAGE plpgsql;
