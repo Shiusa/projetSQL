@@ -395,13 +395,13 @@ BEGIN
     END IF;
 
 
-    FOR candidatures_rec IN SELECT * FROM projet.candidatures WHERE (code_offre_stage = _code_offre_stage)
-    LOOP
-        SELECT ca.etat, et.nom, et.prenom, et.email, ca.motivations
-        FROM candidatures_rec ca, projet.etudiants et
-        WHERE (ca.etudiant = et.id_etudiant)
+    FOR candidatures_rec IN
+        SELECT ea.etat, et.nom, et.prenom, et.email, ca.motivations
+        FROM projet.candidatures ca, projet.etudiants et, projet.etats ea
+        WHERE (ca.etudiant = et.id_etudiant AND ca.etat = ea.id_etat)
         AND(ca.code_offre_stage = _code_offre_stage)
-        INTO sortie;
+    LOOP
+        SELECT candidatures_rec.etat, candidatures_rec.nom, candidatures_rec.prenom, candidatures_rec.email, candidatures_rec.motivations INTO sortie;
         RETURN NEXT sortie;
     END LOOP;
     RETURN;

@@ -44,7 +44,7 @@ public class Entreprise {
             voirMotsCles = conn.prepareStatement("SELECT * FROM projet.voir_mots_cles");
             ajouterMotCle = conn.prepareStatement("SELECT projet.ajouter_mot_cle_offre_stage (?,?)");
             voirSesOffresStages = conn.prepareStatement("SELECT * FROM projet.voir_offres_stages_entreprise (?) t(code VARCHAR(5), description VARCHAR(1000), semestre semestre, etat VARCHAR(100), nb_candidature INTEGER, etudiant TEXT)");
-            voirCandidatures = conn.prepareStatement("SELECT projet.voir_candidatures(?,?)");
+            voirCandidatures = conn.prepareStatement("SELECT * FROM projet.voir_candidatures(?,?) ec(etat VARCHAR(100), nom VARCHAR(100), prenom VARCHAR(100), email VARCHAR(100), motivations VARCHAR(1000))");
             selectionnerEtudiant = conn.prepareStatement("SELECT projet.selectionner_etudiant_offre_stage (?,?,?)");
             annulerOffreStage = conn.prepareStatement("SELECT projet.annuler_offre_stage (?)");
             seConnecter = conn.prepareStatement("SELECT mdp FROM projet.entreprise WHERE id_entreprise=?");
@@ -243,7 +243,34 @@ public class Entreprise {
     }
 
     public void voirCandidatures() {
+
+        String codeOffreStage;
+
         System.out.println("Voir les candidatures");
+        System.out.println("Code offre stage: ");
+        codeOffreStage = scanner.nextLine();
+
+        try {
+            voirCandidatures.setString(1,codeOffreStage);
+            voirCandidatures.setString(2,getIdEntreprise());
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
+        try(ResultSet rs = voirCandidatures.executeQuery()) {
+            while (rs.next()) {
+                System.out.println(
+                        "\nEtat: " + rs.getString(1) + "\n"
+                        +"Nom: " + rs.getString(2) + "\n"
+                        +"Prénom: " + rs.getString(3) + "\n"
+                        +"Email: " + rs.getString(4) +"\n"
+                        +"Motivations: " + rs.getString(5) +"\n"
+                );
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
     public void selectionnerEtudiant() {
