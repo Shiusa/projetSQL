@@ -1,7 +1,4 @@
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.InputMismatchException;
 import java.util.Scanner;
 
@@ -11,6 +8,8 @@ public class Entreprise {
 
     private Connection conn = null;
 
+    private String idEntreprise;
+
     private PreparedStatement encoderOffreStage;
     private PreparedStatement voirMotsCles;
     private PreparedStatement ajouterMotCle;
@@ -18,6 +17,8 @@ public class Entreprise {
     private PreparedStatement voirCandidatures;
     private PreparedStatement selectionnerEtudiant;
     private PreparedStatement annulerOffreStage;
+
+    private PreparedStatement seConnecter;
 
     public Entreprise() {
 
@@ -45,6 +46,7 @@ public class Entreprise {
             voirCandidatures = conn.prepareStatement("SELECT projet.voir_candidatures(?,?)");
             //selectionnerEtudiant = conn.prepareStatement("SELECT * FROM projet.get_offres_validees");
             annulerOffreStage = conn.prepareStatement("SELECT projet.annuler_offre_stage (?)");
+            seConnecter = conn.prepareStatement("SELECT mdp FROM projet.entreprise WHERE id_entreprise=?");
         } catch (SQLException e) {
             System.out.println("Erreur !");
             System.exit(1);
@@ -53,6 +55,47 @@ public class Entreprise {
     }
 
     public void start() {
+
+        String identifiant, mdp;
+        Boolean connecte = false;
+
+        System.out.println("Application Entreprise");
+
+        System.out.println("Veuillez vous connecter");
+        System.out.println("Identifiant: ");
+        identifiant = scanner.nextLine();
+        System.out.println("Mot de passe: ");
+        mdp = scanner.nextLine();
+        try {
+            seConnecter.setString(1,identifiant);
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
+        while (!connecte) {
+
+            try(ResultSet rs = seConnecter.executeQuery()) {
+                while (rs.next()) {
+                    if (BCrypt.checkpw(mdp, rs.getString(1))) {
+                        connecte = true;
+                        setIdEntreprise(idEntreprise);
+                        break;
+                    }
+                }
+                if (!connecte) {
+                    System.out.println("\nMauvais identifiants de connexion");
+                    System.out.println("Identifiant: ");
+                    identifiant = scanner.nextLine();
+                    System.out.println("Mot de passe: ");
+                    mdp = scanner.nextLine();
+                    seConnecter.setString(1,identifiant);
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+
 
         int option;
 
@@ -124,6 +167,14 @@ public class Entreprise {
 
     public void annulerOffreStage() {
         System.out.println("Annuler une offre de stage");
+    }
+
+    public String getIdEntreprise() {
+        return idEntreprise;
+    }
+
+    public void setIdEntreprise(String idEntreprise) {
+        this.idEntreprise = idEntreprise;
     }
 
 }
