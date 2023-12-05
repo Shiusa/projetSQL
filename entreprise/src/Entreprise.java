@@ -274,7 +274,24 @@ public class Entreprise {
     }
 
     public void selectionnerEtudiant() {
+
+        String codeOffreStage, email;
+
         System.out.println("Selectionner un étudiant");
+        System.out.println("Code offre stage: ");
+        codeOffreStage = scanner.nextLine();
+        System.out.println("Email de l'étudiant: ");
+        email = scanner.nextLine();
+
+        try {
+            selectionnerEtudiant.setString(1,getIdEntreprise());
+            selectionnerEtudiant.setString(2,codeOffreStage);
+            selectionnerEtudiant.setString(3,email);
+            selectionnerEtudiant.executeQuery();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
     public void annulerOffreStage() {

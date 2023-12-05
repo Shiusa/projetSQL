@@ -51,7 +51,7 @@ CREATE TABLE projet.offres_stage (
 
 CREATE TABLE projet.candidatures (
     offre_stage INTEGER REFERENCES projet.offres_stage(id_offre_stage) NOT NULL,
-    code_offre_stage VARCHAR(5) NOT NULL UNIQUE,
+    code_offre_stage VARCHAR(5) NOT NULL,
     etudiant INTEGER REFERENCES projet.etudiants(id_etudiant) NOT NULL,
     CONSTRAINT candidatures_pk PRIMARY KEY (offre_stage, etudiant),
     etat INTEGER REFERENCES projet.etats(id_etat) NOT NULL,
@@ -410,7 +410,7 @@ $$ LANGUAGE plpgsql;
 
 
 --entreprise Q6
-CREATE OR REPLACE FUNCTION projet.selectionner_etudiant_offre_stage(_id_entreprise CHAR(3), _code_offre VARCHAR, _email_etudiant VARCHAR)
+/*CREATE OR REPLACE FUNCTION projet.selectionner_etudiant_offre_stage(_id_entreprise CHAR(3), _code_offre VARCHAR, _email_etudiant VARCHAR)
     RETURNS VOID
 AS $$
 DECLARE
@@ -515,6 +515,108 @@ BEGIN
         );
 
     RAISE NOTICE 'L''offre de stage a été attribuée à l''étudiant avec succès.';
+END;
+$$ LANGUAGE plpgsql;*/
+
+CREATE OR REPLACE FUNCTION projet.selectionner_etudiant_offre_stage(_entreprise CHAR(3), _code_offre_stage VARCHAR(5), _email_etudiant VARCHAR(100))
+RETURNS VOID
+AS $$
+DECLARE
+    v_id_entreprise CHAR(3);
+    etat_validee INTEGER;
+    etat_attente INTEGER;
+    etat_attribuee INTEGER;
+    etat_acceptee INTEGER;
+    etat_annulee INTEGER;
+    etat_refusee INTEGER;
+    offre_etat INTEGER;
+    candidature_etat INTEGER;
+    v_id_etudiant INTEGER;
+    semestre_etudiant semestre;
+    candidature_sel_rec RECORD;
+    candidature_non_sel_rec RECORD;
+    offre_stage_annule_rec RECORD;
+    candidature_offre_annule_rec RECORD;
+BEGIN
+    v_id_entreprise := SUBSTRING(_code_offre_stage FROM 1 FOR 3);
+    IF v_id_entreprise != _entreprise
+        THEN RAISE'Vous n''avez pas d''offre ayant ce code';
+    END IF;
+    IF NOT EXISTS(
+            SELECT * FROM projet.offres_stage WHERE (projet.offres_stage.code=_code_offre_stage AND projet.offres_stage.entreprise = _entreprise)
+        ) THEN RAISE 'Vous n''avez pas d''offre ayant ce code';
+    END IF;
+
+    SELECT id_etat FROM projet.etats WHERE (projet.etats.etat = 'validée') INTO etat_validee;
+    SELECT id_etat FROM projet.etats WHERE (projet.etats.etat = 'en attente') INTO etat_attente;
+    SELECT id_etat FROM projet.etats WHERE (projet.etats.etat = 'attribuée') INTO etat_attribuee;
+    SELECT id_etat FROM projet.etats WHERE (projet.etats.etat = 'acceptée') INTO etat_acceptee;
+    SELECT id_etat FROM projet.etats WHERE (projet.etats.etat = 'annulée') INTO etat_annulee;
+    SELECT id_etat FROM projet.etats WHERE (projet.etats.etat = 'refusée') INTO etat_refusee;
+    SELECT etat FROM projet.offres_stage WHERE (projet.offres_stage.code=_code_offre_stage AND projet.offres_stage.entreprise = _entreprise) INTO offre_etat;
+    SELECT id_etudiant, semestre FROM projet.etudiants WHERE (projet.etudiants.email = _email_etudiant) INTO v_id_etudiant, semestre_etudiant;
+    SELECT etat FROM projet.candidatures WHERE (projet.candidatures.etudiant = v_id_etudiant AND projet.candidatures.code_offre_stage = _code_offre_stage) INTO candidature_etat;
+
+    IF offre_etat != etat_validee
+        THEN RAISE 'Vous n''avez pas d''offre ayant ce code';
+    END IF;
+    IF candidature_etat != etat_attente
+        THEN RAISE 'La candidature n''est pas en attente';
+    END IF;
+
+    UPDATE projet.offres_stage
+    SET etat = etat_attribuee, etudiant = v_id_etudiant
+    WHERE (code = _code_offre_stage);
+
+    UPDATE projet.candidatures
+    SET etat = etat_acceptee
+    WHERE (etudiant = v_id_etudiant AND code_offre_stage = _code_offre_stage);
+
+    FOR candidature_sel_rec IN
+        SELECT * FROM projet.candidatures
+        WHERE (etudiant = v_id_etudiant)
+        AND(code_offre_stage <> _code_offre_stage)
+    LOOP
+        UPDATE projet.candidatures
+        SET etat = etat_annulee
+        WHERE (etudiant = v_id_etudiant)
+        AND(offre_stage = candidature_sel_rec.offre_stage);
+    END LOOP;
+
+    FOR candidature_non_sel_rec IN
+        SELECT * FROM projet.candidatures
+        WHERE (etudiant <> v_id_etudiant)
+        AND(code_offre_stage = _code_offre_stage)
+    LOOP
+        UPDATE projet.candidatures
+        SET etat = etat_refusee
+        WHERE (etudiant = candidature_non_sel_rec.etudiant)
+        AND(offre_stage = candidature_non_sel_rec.offre_stage);
+    END LOOP;
+
+    FOR offre_stage_annule_rec IN
+        SELECT * FROM projet.offres_stage
+        WHERE (offres_stage.entreprise = _entreprise)
+        AND (offres_stage.etat <> etat_attribuee)
+        AND(semestre = semestre_etudiant)
+    LOOP
+        UPDATE projet.offres_stage
+        SET etat = etat_annulee
+        WHERE (id_offre_stage = offre_stage_annule_rec.id_offre_stage);
+
+        FOR candidature_offre_annule_rec IN
+            SELECT * FROM projet.candidatures
+            WHERE (offre_stage = offre_stage_annule_rec.id_offre_stage)
+            AND(etudiant = offre_stage_annule_rec.etudiant)
+        LOOP
+            UPDATE projet.candidatures
+            SET etat = etat_refusee
+            WHERE (offre_stage = candidature_offre_annule_rec.offre_stage)
+            AND(etudiant = candidature_offre_annule_rec.etudiant);
+        END LOOP;
+
+    END LOOP;
+
 END;
 $$ LANGUAGE plpgsql;
 
