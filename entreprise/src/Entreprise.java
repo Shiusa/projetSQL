@@ -1,3 +1,4 @@
+import java.lang.reflect.Type;
 import java.sql.*;
 import java.util.InputMismatchException;
 import java.util.Scanner;
@@ -78,7 +79,7 @@ public class Entreprise {
                 while (rs.next()) {
                     if (BCrypt.checkpw(mdp, rs.getString(1))) {
                         connecte = true;
-                        setIdEntreprise(idEntreprise);
+                        setIdEntreprise(identifiant);
                         break;
                     }
                 }
@@ -142,7 +143,32 @@ public class Entreprise {
     }
 
     public void encoderOffreStage() {
+
+        String description;
+        Semestre semestre = null;
+
         System.out.println("Encoder une offre de stage");
+        System.out.println("Description: ");
+        description = scanner.nextLine();
+        System.out.println("Semestre (\"Q1\",\"Q2\"): ");
+        while (semestre == null) {
+            try {
+                semestre = Semestre.valueOf(scanner.nextLine());
+            } catch (IllegalArgumentException e) {
+                System.out.println("Semestre inexistant, entrer a nouveau le semestre");
+                System.out.println("Semestre (\"Q1\",\"Q2\"): ");
+            }
+        }
+
+        try {
+            encoderOffreStage.setString(1,description);
+            encoderOffreStage.setObject(2, semestre, Types.OTHER);
+            encoderOffreStage.setString(3,getIdEntreprise());
+            encoderOffreStage.executeQuery();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     public void voirMotsCles() {
