@@ -43,7 +43,7 @@ public class Entreprise {
             encoderOffreStage = conn.prepareStatement("SELECT projet.encoder_offre_stage (?,?,?)");
             voirMotsCles = conn.prepareStatement("SELECT * FROM projet.voir_mots_cles");
             ajouterMotCle = conn.prepareStatement("SELECT projet.ajouter_mot_cle_offre_stage (?,?)");
-            voirSesOffresStages = conn.prepareStatement("SELECT projet.voir_offres_stages_entreprise (?)");
+            voirSesOffresStages = conn.prepareStatement("SELECT * FROM projet.voir_offres_stages_entreprise (?) t(code VARCHAR(5), description VARCHAR(1000), semestre semestre, etat VARCHAR(100), nb_candidature INTEGER, etudiant TEXT)");
             voirCandidatures = conn.prepareStatement("SELECT projet.voir_candidatures(?,?)");
             selectionnerEtudiant = conn.prepareStatement("SELECT projet.selectionner_etudiant_offre_stage (?,?,?)");
             annulerOffreStage = conn.prepareStatement("SELECT projet.annuler_offre_stage (?)");
@@ -214,7 +214,32 @@ public class Entreprise {
     }
 
     public void voirSesOffresStages() {
+
         System.out.println("Voir ses offres de stage");
+
+        try {
+            voirSesOffresStages.setString(1,getIdEntreprise());
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        try(ResultSet rs = voirSesOffresStages.executeQuery()) {
+            while (rs.next()) {
+                /*Array a = rs.getArray(1);
+                String[] result = (String[])a.getArray();*/
+                System.out.println(
+                        "\nCode: " + rs.getString(1) + "\n"
+                        +"Description: " + rs.getString(2) + "\n"
+                        +"Semestre: " + rs.getString(3) + "\n"
+                        +"Etat: " + rs.getString(4) +"\n"
+                        +"Nb candidatures en attente: " + rs.getInt(5) +"\n"
+                        +"Etudiant: " + rs.getString(6) +"\n"
+                );
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
     public void voirCandidatures() {

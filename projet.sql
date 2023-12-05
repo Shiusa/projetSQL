@@ -313,14 +313,14 @@ EXECUTE PROCEDURE ajouter_mot_cle_offre_stage_trigger();
 
 
 --entreprise Q4
-CREATE OR REPLACE FUNCTION projet.voir_offres_stages_entreprise(_id_entreprise CHAR(3))
+/*CREATE OR REPLACE FUNCTION projet.voir_offres_stages_entreprise(_id_entreprise CHAR(3))
 RETURNS TABLE (
     code_offre VARCHAR,
     description VARCHAR,
     semestre semestre,
     etat VARCHAR,
-    nb_candidatures_en_attente INTEGER,
-    nom_etudiant_attribue VARCHAR
+    nb_candidatures_en_attente BIGINT,
+    nom_etudiant_attribue TEXT
 )
 AS $$
 BEGIN
@@ -347,6 +347,28 @@ BEGIN
 
     RETURN;
 END;
+$$ LANGUAGE plpgsql;*/
+
+CREATE OR REPLACE FUNCTION projet.voir_offres_stages_entreprise(_entreprise CHAR(3))
+RETURNS SETOF RECORD
+AS $$
+DECLARE
+    sortie RECORD;
+    offres_rec RECORD;
+BEGIN
+
+    FOR offres_rec IN
+        SELECT os.code, os.description, os.semestre, ea.etat::VARCHAR(100), os.nb_candidature, coalesce(et.nom, 'pas attribuée')::TEXT AS "etudiant"
+        FROM projet.offres_stage os LEFT OUTER JOIN projet.etudiants et on os.etudiant = et.id_etudiant
+        LEFT OUTER JOIN projet.etats ea on os.etat = ea.id_etat
+        WHERE (os.entreprise = _entreprise)
+    LOOP
+        SELECT offres_rec.code, offres_rec.description, offres_rec.semestre,offres_rec.etat, offres_rec.nb_candidature, offres_rec.etudiant INTO sortie;
+        RETURN NEXT sortie;
+    END LOOP;
+    RETURN;
+
+end;
 $$ LANGUAGE plpgsql;
 
 
