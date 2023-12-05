@@ -295,7 +295,20 @@ public class Entreprise {
     }
 
     public void annulerOffreStage() {
+
+        String codeOffreStage;
+
         System.out.println("Annuler une offre de stage");
+        System.out.println("Code offre stage: ");
+        codeOffreStage = scanner.nextLine();
+
+        try {
+            annulerOffreStage.setString(1,codeOffreStage);
+            annulerOffreStage.executeQuery();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
     public String getIdEntreprise() {

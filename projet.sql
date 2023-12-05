@@ -628,6 +628,7 @@ RETURNS VOID
 AS $$
 DECLARE
     v_offre_id INTEGER;
+    candidature_rec RECORD;
 BEGIN
     -- Vérifier si l'offre de stage existe et appartient à l'entreprise
     SELECT id_offre_stage
@@ -646,9 +647,14 @@ BEGIN
     WHERE id_offre_stage = v_offre_id;
 
     -- Mettre à jour l'état des candidatures en attente à "refusée"
-    UPDATE projet.candidatures
-    SET etat = (SELECT id_etat FROM projet.etats WHERE etat = 'refusée')
-    WHERE offre_stage = v_offre_id;
+    FOR candidature_rec IN
+        SELECT * FROM projet.candidatures WHERE (candidatures.code_offre_stage = p_code_offre)
+    LOOP
+        UPDATE projet.candidatures
+        SET etat = (SELECT id_etat FROM projet.etats WHERE etat = 'refusée')
+        WHERE offre_stage = candidature_rec.offre_stage
+        AND(etudiant = candidature_rec.etudiant);
+    END LOOP;
 
     RAISE NOTICE 'L''offre de stage a été annulée avec succès.';
 END;
