@@ -176,7 +176,21 @@ public class Entreprise {
     }
 
     public void voirMotsCles() {
+
         System.out.println("Voir les mots-clés disponibles");
+
+        try(ResultSet rs = voirMotsCles.executeQuery()) {
+            System.out.println();
+            while (rs.next()) {
+                System.out.println(
+                        rs.getString(1)
+                );
+            }
+            System.out.println();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
     public void ajouterMotCle() {
