@@ -170,7 +170,11 @@ public class Entreprise {
             encoderOffreStage.setString(3,getIdEntreprise());
             encoderOffreStage.executeQuery();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            if (e.getMessage().contains("Offre de stage déjà attribuée durant ce semestre")) {
+                System.out.println("Offre de stage déjà attribuée durant ce semestre. Veuillez réessayer.");
+            } else {
+                throw new RuntimeException(e);
+            }
         }
 
     }
