@@ -387,7 +387,7 @@ $$ LANGUAGE plpgsql;
 
 
 --entreprise Q6
-CREATE OR REPLACE FUNCTION selectionner_etudiant_offre_stage(_id_entreprise CHAR(3), _code_offre VARCHAR, _email_etudiant VARCHAR)
+CREATE OR REPLACE FUNCTION projet.selectionner_etudiant_offre_stage(_id_entreprise CHAR(3), _code_offre VARCHAR, _email_etudiant VARCHAR)
     RETURNS VOID
 AS $$
 DECLARE
@@ -498,7 +498,7 @@ $$ LANGUAGE plpgsql;
 
 
 --entreprise Q7
-CREATE OR REPLACE FUNCTION annuler_offre_stage(p_code_offre VARCHAR)
+CREATE OR REPLACE FUNCTION projet.annuler_offre_stage(p_code_offre VARCHAR)
 RETURNS VOID
 AS $$
 DECLARE

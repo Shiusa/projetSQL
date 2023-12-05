@@ -41,11 +41,11 @@ public class Entreprise {
 
         try {
             encoderOffreStage = conn.prepareStatement("SELECT projet.encoder_offre_stage (?,?,?)");
-            voirMotsCles = conn.prepareStatement("SELECT * FROM projet.visualiser_mots_cles");
+            voirMotsCles = conn.prepareStatement("SELECT * FROM projet.voir_mots_cles");
             ajouterMotCle = conn.prepareStatement("SELECT projet.ajouter_mot_cle_offre_stage (?,?,?)");
-            voirSesOffresStages = conn.prepareStatement("SELECT projet.get_offres_stages_entreprise (?)");
+            voirSesOffresStages = conn.prepareStatement("SELECT projet.voir_offres_stages_entreprise (?)");
             voirCandidatures = conn.prepareStatement("SELECT projet.voir_candidatures(?,?)");
-            //selectionnerEtudiant = conn.prepareStatement("SELECT * FROM projet.get_offres_validees");
+            selectionnerEtudiant = conn.prepareStatement("SELECT projet.selectionner_etudiant_offre_stage (?,?,?)");
             annulerOffreStage = conn.prepareStatement("SELECT projet.annuler_offre_stage (?)");
             seConnecter = conn.prepareStatement("SELECT mdp FROM projet.entreprise WHERE id_entreprise=?");
         } catch (SQLException e) {
