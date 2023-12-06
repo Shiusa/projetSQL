@@ -959,3 +959,20 @@ BEGIN
     END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+GRANT CONNECT ON DATABASE /**/ TO jasonchu;
+GRANT USAGE ON SCHEMA projet to jasonchu;
+
+GRANT SELECT ON ALL TABLES IN SCHEMA projet TO jasonchu;
+
+GRANT SELECT ON projet.voir_mots_cles TO jasonchu;
+
+GRANT INSERT ON TABLE projet.offre_mot TO jasonchu;
+GRANT INSERT ON TABLE projet.offres_stage TO jasonchu;
+
+GRANT UPDATE ON TABLE projet.offres_stage TO jasonchu;
+GRANT UPDATE ON TABLE projet.candidatures TO jasonchu;
+
+
+
+
