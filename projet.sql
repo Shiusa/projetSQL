@@ -631,18 +631,27 @@ $$ LANGUAGE plpgsql;
 
 
 --entreprise Q7
-CREATE OR REPLACE FUNCTION projet.annuler_offre_stage(p_code_offre VARCHAR)
+CREATE OR REPLACE FUNCTION projet.annuler_offre_stage(_code_offre_stage VARCHAR, _entreprise CHAR(3))
 RETURNS VOID
 AS $$
 DECLARE
     v_offre_id INTEGER;
     candidature_rec RECORD;
+    v_id_entreprise CHAR(3);
 BEGIN
+    v_id_entreprise := SUBSTRING(_code_offre_stage FROM 1 FOR 3);
+    IF v_id_entreprise != _entreprise
+    THEN RAISE'Vous n''avez pas d''offre ayant ce code';
+    END IF;
+    IF NOT EXISTS(
+            SELECT * FROM projet.offres_stage WHERE (projet.offres_stage.code=_code_offre_stage AND projet.offres_stage.entreprise = _entreprise)
+        ) THEN RAISE 'Vous n''avez pas d''offre ayant ce code';
+    END IF;
     -- Vérifier si l'offre de stage existe et appartient à l'entreprise
     SELECT id_offre_stage
     INTO v_offre_id
     FROM projet.offres_stage o
-    WHERE o.code = p_code_offre
+    WHERE o.code = _code_offre_stage
     AND o.etat NOT IN (SELECT id_etat FROM projet.etats WHERE etat IN ('attribuée', 'annulée'));
 
     IF v_offre_id IS NULL THEN
@@ -656,7 +665,7 @@ BEGIN
 
     -- Mettre à jour l'état des candidatures en attente à "refusée"
     FOR candidature_rec IN
-        SELECT * FROM projet.candidatures WHERE (candidatures.code_offre_stage = p_code_offre)
+        SELECT * FROM projet.candidatures WHERE (candidatures.code_offre_stage = _code_offre_stage)
     LOOP
         UPDATE projet.candidatures
         SET etat = (SELECT id_etat FROM projet.etats WHERE etat = 'refusée')
