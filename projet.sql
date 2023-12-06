@@ -939,23 +939,28 @@ $$ LANGUAGE plpgsql;
 
 
 --eleve Q5
-CREATE OR REPLACE FUNCTION annuler_candidature(_code_offre_stage VARCHAR(5), _id_etudiant INTEGER)
+CREATE OR REPLACE FUNCTION annuler_candidature(_code_offre_stage VARCHAR(5), _email_etudiant VARCHAR(100))
 RETURNS VOID AS $$
 BEGIN
     -- Vérifier si la candidature est en attente
     IF EXISTS (
         SELECT *
         FROM projet.candidatures c
+        JOIN projet.etudiants e ON c.etudiant = e.id_etudiant
         WHERE c.code_offre_stage = _code_offre_stage
-          AND c.etudiant = _id_etudiant
+          AND e.email = _email_etudiant
           AND c.etat = (SELECT id_etat FROM projet.etats WHERE etat = 'en attente')
     ) THEN
         -- Annuler la candidature
-        DELETE FROM projet.candidatures
-        WHERE code_offre_stage = _code_offre_stage
-          AND etudiant = _id_etudiant;
-    ELSE
+UPDATE projet.candidatures
+SET etat = 'annulée'
+WHERE code_offre_stage = _code_offre_stage AND etudiant = (
+            SELECT id_etudiant
+            FROM projet.etudiants
+            WHERE email = _email_etudiant
+        );
+ELSE
         RAISE EXCEPTION 'La candidature ne peut être annulée que si elle est en attente.';
-    END IF;
+END IF;
 END;
 $$ LANGUAGE plpgsql;

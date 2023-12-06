@@ -128,12 +128,12 @@ public class Etudiant {
 
                 try (ResultSet resultSet = connecterEtudiant.executeQuery()) {
                     if (resultSet.next()) {
-                        // Successful login
+
                         System.out.println("Bienvenue!");
                         login = true;
                         setEmail(email);
                     } else {
-                        // No rows returned, indicating incorrect email or password
+
                         System.out.println("Mauvais email ou mot de passe !");
                     }
                 }
@@ -255,18 +255,15 @@ public class Etudiant {
     public void annulerCandidature() {
 
         String codeOffreStage;
-        int etudiant;
+
 
         System.out.println("Annuler une offre de stage");
         System.out.println("Code offre stage: ");
         codeOffreStage = scanner.nextLine();
 
-        System.out.println("ID étudiant: ");
-        etudiant = scanner.nextInt();
-
         try {
             annulerCandidature.setString(1,codeOffreStage);
-            annulerCandidature.setInt(2,etudiant);
+            annulerCandidature.setString(2,getEmail());
             annulerCandidature.executeQuery();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
