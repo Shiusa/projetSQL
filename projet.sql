@@ -939,28 +939,40 @@ $$ LANGUAGE plpgsql;
 
 
 --eleve Q5
-CREATE OR REPLACE FUNCTION annuler_candidature(_code_offre_stage VARCHAR(5), _email_etudiant VARCHAR(100))
+CREATE OR REPLACE FUNCTION annuler_candidature(_code_offre_stage VARCHAR(5), _id_etudiant INTEGER)
 RETURNS VOID AS $$
 BEGIN
     -- Vérifier si la candidature est en attente
     IF EXISTS (
         SELECT *
         FROM projet.candidatures c
-        JOIN projet.etudiants e ON c.etudiant = e.id_etudiant
         WHERE c.code_offre_stage = _code_offre_stage
-          AND e.email = _email_etudiant
+          AND c.etudiant = _id_etudiant
           AND c.etat = (SELECT id_etat FROM projet.etats WHERE etat = 'en attente')
     ) THEN
         -- Annuler la candidature
-UPDATE projet.candidatures
-SET etat = 'annulée'
-WHERE code_offre_stage = _code_offre_stage AND etudiant = (
-            SELECT id_etudiant
-            FROM projet.etudiants
-            WHERE email = _email_etudiant
-        );
-ELSE
+        DELETE FROM projet.candidatures
+        WHERE code_offre_stage = _code_offre_stage
+          AND etudiant = _id_etudiant;
+    ELSE
         RAISE EXCEPTION 'La candidature ne peut être annulée que si elle est en attente.';
-END IF;
+    END IF;
 END;
 $$ LANGUAGE plpgsql;
+
+GRANT CONNECT ON DATABASE /**/ TO jasonchu;
+GRANT USAGE ON SCHEMA projet to jasonchu;
+
+GRANT SELECT ON ALL TABLES IN SCHEMA projet TO jasonchu;
+
+GRANT SELECT ON projet.voir_mots_cles TO jasonchu;
+
+GRANT INSERT ON TABLE projet.offre_mot TO jasonchu;
+GRANT INSERT ON TABLE projet.offres_stage TO jasonchu;
+
+GRANT UPDATE ON TABLE projet.offres_stage TO jasonchu;
+GRANT UPDATE ON TABLE projet.candidatures TO jasonchu;
+
+
+
+
