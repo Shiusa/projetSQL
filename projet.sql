@@ -258,7 +258,7 @@ CREATE OR REPLACE VIEW projet.voir_mots_cles AS
 
 
 --entreprise Q3
-CREATE OR REPLACE FUNCTION projet.ajouter_mot_cle_offre_stage(_code_offre_stage VARCHAR(5), _mot_cle VARCHAR(100))
+CREATE OR REPLACE FUNCTION projet.ajouter_mot_cle_offre_stage(_code_offre_stage VARCHAR(5), _mot_cle VARCHAR(100), _entreprise CHAR(3))
 RETURNS VOID AS $$
 DECLARE
     mot_cle_id INTEGER;
@@ -266,11 +266,21 @@ DECLARE
     etat_attribuee INTEGER;
     etat_annulee INTEGER;
     etat_os INTEGER;
+    id_entreprise CHAR(3);
 BEGIN
+    id_entreprise := SUBSTRING(_code_offre_stage FROM 1 FOR 3);
+    IF id_entreprise != _entreprise
+    THEN RAISE'Vous n''avez pas d''offre ayant ce code';
+    END IF;
+    IF NOT EXISTS(
+            SELECT * FROM projet.offres_stage WHERE (projet.offres_stage.code=_code_offre_stage AND projet.offres_stage.entreprise = _entreprise)
+        ) THEN RAISE 'Vous n''avez pas d''offre ayant ce code';
+    END IF;
+
     SELECT id_offre_stage FROM projet.offres_stage WHERE (code = _code_offre_stage) INTO offre_stage_id;
     SELECT id_mot_cle FROM projet.mots_cles WHERE (mot = _mot_cle) INTO mot_cle_id;
     SELECT id_etat FROM projet.etats WHERE etat = 'attribuée' INTO etat_attribuee;
-    SELECT id_etat FROM projet.etats WHERE etat = 'attribuée' INTO etat_annulee;
+    SELECT id_etat FROM projet.etats WHERE etat = 'annulée' INTO etat_annulee;
     SELECT os.etat FROM projet.offres_stage os WHERE (os.code = _code_offre_stage) INTO etat_os;
     IF (etat_os = etat_annulee OR etat_os = etat_attribuee)
         THEN RAISE 'Impossible d''ajouter un mot-clé à une offre dans l''état attribuée ou annulée';
