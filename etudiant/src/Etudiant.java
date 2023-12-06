@@ -6,9 +6,6 @@ public class Etudiant {
     private Scanner scanner = new Scanner(System.in);
 
     private String email;
-
-
-
     private String salt = BCrypt.gensalt();
 
     private Connection conn = null;
@@ -16,6 +13,7 @@ public class Etudiant {
     private PreparedStatement visualiserOffresStageValides;
     private PreparedStatement rechercherOffreStageMotsCle;
     private PreparedStatement poserCandidature;
+
     private PreparedStatement  getIdEtudiant;
 
     private PreparedStatement getOffresEtudiant;
@@ -271,14 +269,6 @@ public class Etudiant {
 
     }
 
-
-
-
-
-
-    public PreparedStatement getConnecterEtudiant() {
-        return connecterEtudiant;
-    }
 
     public String getEmail() {
         return email;
