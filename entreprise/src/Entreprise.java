@@ -42,11 +42,11 @@ public class Entreprise {
         try {
             encoderOffreStage = conn.prepareStatement("SELECT projet.encoder_offre_stage (?,?,?)");
             voirMotsCles = conn.prepareStatement("SELECT * FROM projet.voir_mots_cles");
-            ajouterMotCle = conn.prepareStatement("SELECT projet.ajouter_mot_cle_offre_stage (?,?)");
+            ajouterMotCle = conn.prepareStatement("SELECT projet.ajouter_mot_cle_offre_stage (?,?,?)");
             voirSesOffresStages = conn.prepareStatement("SELECT * FROM projet.voir_offres_stages_entreprise (?) t(code VARCHAR(5), description VARCHAR(1000), semestre semestre, etat VARCHAR(100), nb_candidature INTEGER, etudiant TEXT)");
             voirCandidatures = conn.prepareStatement("SELECT * FROM projet.voir_candidatures(?,?) ec(etat VARCHAR(100), nom VARCHAR(100), prenom VARCHAR(100), email VARCHAR(100), motivations VARCHAR(1000))");
             selectionnerEtudiant = conn.prepareStatement("SELECT projet.selectionner_etudiant_offre_stage (?,?,?)");
-            annulerOffreStage = conn.prepareStatement("SELECT projet.annuler_offre_stage (?)");
+            annulerOffreStage = conn.prepareStatement("SELECT projet.annuler_offre_stage (?,?)");
             seConnecter = conn.prepareStatement("SELECT mdp FROM projet.entreprise WHERE id_entreprise=?");
         } catch (SQLException e) {
             System.out.println("Erreur !");
@@ -206,6 +206,7 @@ public class Entreprise {
         try {
             ajouterMotCle.setString(1,codeOffreStage);
             ajouterMotCle.setString(2,motCle);
+            ajouterMotCle.setString(3,getIdEntreprise());
             ajouterMotCle.executeQuery();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -304,6 +305,7 @@ public class Entreprise {
 
         try {
             annulerOffreStage.setString(1,codeOffreStage);
+            annulerOffreStage.setString(2,getIdEntreprise());
             annulerOffreStage.executeQuery();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
