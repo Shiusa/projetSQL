@@ -150,6 +150,11 @@ RETURNS VOID
 AS $$
 BEGIN
 
+    IF NOT EXISTS(
+        SELECT * FROM projet.offres_stage WHERE code = _code
+        )
+        THEN RAISE 'Cette offre n''existe pas';
+    END IF;
     IF ((SELECT os.etat FROM projet.offres_stage os WHERE os.code = _code) <> (SELECT id_etat FROM projet.etats WHERE etat = 'non validée'))
     THEN
         RAISE 'ce stage ne peut pas etre validée';

@@ -65,12 +65,11 @@ public class Etudiant {
         int option;
 
         while (true) {
-            System.out.println("1 - Se connecter");
-            System.out.println("2 - Visualiser les offres de stages valides");
-            System.out.println("3 - Rechercher des offres de stages par mots clés");
-            System.out.println("4 - Poser une candidature");
-            System.out.println("5 - Voir les offres de stage de l'étudiant");
-            System.out.println("6 - Annuler une candidature");
+            System.out.println("1 - Visualiser les offres de stages valides");
+            System.out.println("2 - Rechercher des offres de stages par mots clés");
+            System.out.println("3 - Poser une candidature");
+            System.out.println("4 - Voir les offres de stage de l'étudiant");
+            System.out.println("5 - Annuler une candidature");
 
 
             try {
