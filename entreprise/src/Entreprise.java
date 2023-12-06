@@ -170,7 +170,7 @@ public class Entreprise {
             encoderOffreStage.setString(3,getIdEntreprise());
             encoderOffreStage.executeQuery();
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            e.printStackTrace();
         }
 
     }
@@ -274,11 +274,41 @@ public class Entreprise {
     }
 
     public void selectionnerEtudiant() {
+
+        String codeOffreStage, email;
+
         System.out.println("Selectionner un étudiant");
+        System.out.println("Code offre stage: ");
+        codeOffreStage = scanner.nextLine();
+        System.out.println("Email de l'étudiant: ");
+        email = scanner.nextLine();
+
+        try {
+            selectionnerEtudiant.setString(1,getIdEntreprise());
+            selectionnerEtudiant.setString(2,codeOffreStage);
+            selectionnerEtudiant.setString(3,email);
+            selectionnerEtudiant.executeQuery();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
     public void annulerOffreStage() {
+
+        String codeOffreStage;
+
         System.out.println("Annuler une offre de stage");
+        System.out.println("Code offre stage: ");
+        codeOffreStage = scanner.nextLine();
+
+        try {
+            annulerOffreStage.setString(1,codeOffreStage);
+            annulerOffreStage.executeQuery();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
     public String getIdEntreprise() {
