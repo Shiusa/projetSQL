@@ -110,31 +110,40 @@ public class Etudiant {
 
 
     private void connecterEtudiant() {
-        String email, mdp;
-        boolean connecte = false;
+        boolean login = false;
+
+        while (!login) {
+            String email, mdp;
+
+            System.out.println("Se connecter");
+            System.out.println("Email: ");
+            email = scanner.nextLine();
+
+            System.out.println("Mot de passe: ");
+            mdp = BCrypt.hashpw(scanner.nextLine(), salt);
 
 
-        System.out.println("Se connecter");
-        System.out.println("Email: ");
-        email = scanner.nextLine();
+            try {
+                connecterEtudiant.setString(1, email);
+                connecterEtudiant.setString(2, mdp);
 
-
-        System.out.println("Mot de passe: ");
-        mdp = BCrypt.hashpw(scanner.nextLine(), salt);
-        setEmail(email);
-
-        try {
-            connecterEtudiant.setString(1, email);
-            connecterEtudiant.setString(2, mdp);
-
-
-            connecterEtudiant.executeQuery();
-        } catch (SQLException throwables) {
-            throwables.printStackTrace();
+                try (ResultSet resultSet = connecterEtudiant.executeQuery()) {
+                    if (resultSet.next()) {
+                        // Successful login
+                        System.out.println("Bienvenue!");
+                        login = true;
+                        setEmail(email);
+                    } else {
+                        // No rows returned, indicating incorrect email or password
+                        System.out.println("Mauvais email ou mot de passe");
+                    }
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
         }
-
-
     }
+
 
 
     public void visualiserOffresStageValides() {
