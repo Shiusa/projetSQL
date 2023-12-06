@@ -6,7 +6,8 @@ public class Etudiant {
     private Scanner scanner = new Scanner(System.in);
 
     private String email;
-    private String salt = BCrypt.gensalt();
+    private Semestre semestre;
+    private int idEtudiant;
 
     private Connection conn = null;
     private PreparedStatement connecterEtudiant;
@@ -18,6 +19,7 @@ public class Etudiant {
 
     private PreparedStatement getOffresEtudiant;
     private PreparedStatement annulerCandidature;
+    private PreparedStatement recupererInfoEtudiant;
 
 
     public Etudiant() {
@@ -45,6 +47,7 @@ public class Etudiant {
             poserCandidature = conn.prepareStatement("SELECT projet.poser_candidature (?,?,?)");
             getOffresEtudiant = conn.prepareStatement("SELECT projet.get_offres_etudiant(?)");
             annulerCandidature = conn.prepareStatement("SELECT projet.annuler_candidature(?,?)");
+            recupererInfoEtudiant = conn.prepareStatement("SELECT * FROM projet.etudiants WHERE email=?");
 
         } catch (SQLException e) {
             System.out.println("Erreur !");
@@ -108,32 +111,33 @@ public class Etudiant {
 
     private void connecterEtudiant() {
         boolean login = false;
+        String mail, mdp;
 
         while (!login) {
-            String email, mdp;
-
-            System.out.println("Se connecter");
             System.out.println("Email: ");
-            email = scanner.nextLine();
-
+            mail = scanner.nextLine();
             System.out.println("Mot de passe: ");
-            mdp = BCrypt.hashpw(scanner.nextLine(), salt);
-
+            mdp = scanner.nextLine();
 
             try {
-                connecterEtudiant.setString(1, email);
-                connecterEtudiant.setString(2, mdp);
+                recupererInfoEtudiant.setString(1, mail);
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
 
-                try (ResultSet resultSet = connecterEtudiant.executeQuery()) {
-                    if (resultSet.next()) {
-
-                        System.out.println("Bienvenue!");
+            try (ResultSet resultSet = recupererInfoEtudiant.executeQuery()) {
+                while (resultSet.next()) {
+                    if (BCrypt.checkpw(mdp, resultSet.getString(6))) {
                         login = true;
-                        setEmail(email);
-                    } else {
-
-                        System.out.println("Mauvais email ou mot de passe !");
+                        setIdEtudiant(resultSet.getInt(1));
+                        setEmail(resultSet.getString(4));
+                        setSemestre(Semestre.valueOf(resultSet.getString(5)));
+                        break;
                     }
+                }
+                if (!login) {
+                    System.out.println("Mauvais identifiant de connexion!");
+                    System.out.println("Veuillez-vous reconnecter");
                 }
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
@@ -269,14 +273,27 @@ public class Etudiant {
 
     }
 
+    public int getIdEtudiant() {
+        return idEtudiant;
+    }
 
     public String getEmail() {
         return email;
+    }
+
+    public Semestre getSemestre() {
+        return semestre;
+    }
+
+    public void setIdEtudiant(int idEtudiant) {
+        this.idEtudiant = idEtudiant;
     }
 
     public void setEmail(String email) {
         this.email = email;
     }
 
-
+    public void setSemestre(Semestre semestre) {
+        this.semestre = semestre;
+    }
 }
