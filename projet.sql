@@ -967,6 +967,7 @@ END;
 $$ LANGUAGE plpgsql;
 
 
+
 GRANT CONNECT ON DATABASE /**/ TO jasonchu;
 GRANT USAGE ON SCHEMA projet to jasonchu;
 
@@ -979,3 +980,29 @@ GRANT INSERT ON TABLE projet.offres_stage TO jasonchu;
 
 GRANT UPDATE ON TABLE projet.offres_stage TO jasonchu;
 GRANT UPDATE ON TABLE projet.candidatures TO jasonchu;
+
+SELECT projet.encoder_etudiant ('De','Jean','j.d@student.vinci.be','Q2',?);
+SELECT projet.encoder_etudiant ('Du','Marc','m.d@student.vinci.be','Q1',?);
+
+SELECT projet.encoder_mot_cle('Java');
+SELECT projet.encoder_mot_cle('Web');
+SELECT projet.encoder_mot_cle('Python');
+
+SELECT projet.encoder_entreprise('VINCI', 'Clos Chapelle-aux-Champs 43', 'VIN', 'mdp');
+
+SELECT projet.encoder_offre_stage ('stage SAP', 'Q2', 'VIN');
+SELECT projet.encoder_offre_stage ('stage BI', 'Q2', 'VIN');
+SELECT projet.encoder_offre_stage ('stage Unity', 'Q2', 'VIN');
+SELECT projet.encoder_offre_stage ('stage IA', 'Q2', 'VIN');
+SELECT projet.encoder_offre_stage ('stage mobile', 'Q1', 'VIN');
+
+-- valider stage VIN1, VIN4, VIN5
+SELECT projet.ajouter_mot_cle_offre_stage ('VIN3', 'Jave', 'VIN');
+SELECT projet.ajouter_mot_cle_offre_stage ('VIN5', 'Jave', 'VIN');
+
+SELECT projet.poser_candidature ('VIN4', 'motivation', 1);
+SELECT projet.poser_candidature ('VIN5', 'motivation', 2);
+
+SELECT projet.encoder_entreprise('ULB', 'Solbosch', 'ULB', 'mdp');
+SELECT projet.encoder_offre_stage ('stage javascript', 'Q2', 'VIN');
+--valider stage ULB1
