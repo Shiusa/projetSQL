@@ -43,7 +43,7 @@ public class Etudiant {
             rechercherOffreStageMotsCle = conn.prepareStatement("SELECT projet.rechercher_offre_stage_mots_cle (?,?)");
             poserCandidature = conn.prepareStatement("SELECT projet.poser_candidature (?,?,?)");
             getOffresEtudiant = conn.prepareStatement("SELECT projet.get_offres_etudiant(?)");
-            annulerCandidature = conn.prepareStatement("SELECT annuler_candidature(?,?)");
+            annulerCandidature = conn.prepareStatement("SELECT projet.annuler_candidature(?,?)");
 
         } catch (SQLException e) {
             System.out.println("Erreur !");
@@ -104,7 +104,6 @@ public class Etudiant {
         }
 
     }
-
 
 
     private void connecterEtudiant() {
@@ -175,129 +174,95 @@ public class Etudiant {
             System.out.println("Saisie invalide");
 
         }
+    }
 
-        private void poserCandidature() {
-            String codeOffreStage, motivation;
-            int etudiant;
-            System.out.println("Poser une candidature");
+    private void poserCandidature() {
+        String codeOffreStage, motivation;
+        int etudiant;
+        System.out.println("Poser une candidature");
 
-            System.out.println("Code offre stage: ");
-            codeOffreStage = scanner.nextLine();
+        System.out.println("Code offre stage: ");
+        codeOffreStage = scanner.nextLine();
 
-            System.out.println("Motivation: ");
-            motivation = scanner.nextLine();
+        System.out.println("Motivation: ");
+        motivation = scanner.nextLine();
 
-            System.out.println("ID étudiant: ");
-            etudiant = scanner.nextInt();
+        System.out.println("ID étudiant: ");
+        etudiant = scanner.nextInt();
 
-            try {
-                poserCandidature.setString(1,codeOffreStage);
-                poserCandidature.setString(2,motivation);
-                poserCandidature.setInt(2,etudiant);
+        try {
+            poserCandidature.setString(1, codeOffreStage);
+            poserCandidature.setString(2, motivation);
+            poserCandidature.setInt(3, etudiant);
 
-                poserCandidature.executeQuery();
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
-
-
+            poserCandidature.executeQuery();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
 
 
+    }
 
-            private void getOffresEtudiant() {
 
-            int etudiant;
-            System.out.println("Voir ses offres de stage");
-            System.out.println("ID étudiant: ");
-            etudiant = scanner.nextInt();
+    private void getOffresEtudiant() {
 
-            try {
-                getOffresEtudiant.setInt(etudiant);
-            } catch (SQLException e) {
-                e.printStackTrace();
+        int etudiant;
+        System.out.println("Voir ses offres de stage");
+        System.out.println("ID étudiant: ");
+        etudiant = scanner.nextInt();
+
+        try {
+            getOffresEtudiant.setInt(1, etudiant);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        try (ResultSet rs = getOffresEtudiant.executeQuery()) {
+            while (rs.next()) {
+                System.out.println(
+                        "\nCode: " + rs.getString(1) + "\n"
+                                + "Entreprise: " + rs.getString(2) + "\n"
+                                + "Etat candidature: " + rs.getString(3) + "\n"
+
+                );
             }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
 
-            try(ResultSet rs = getOffresEtudiant.executeQuery()) {
-                while (rs.next()) {
-                    System.out.println(
-                            "\nCode: " + rs.getString(1) + "\n"
-                                    +"Entreprise: " + rs.getString(2) + "\n"
-                                    +"Etat candidature: " + rs.getString(3) + "\n"
 
-                    );
-                }
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            }
+    }
+
+}
 
 
 
-            }
+    public void annulerCandidature() {
 
+        String codeOffreStage;
+        int etudiant;
 
+        System.out.println("Annuler une offre de stage");
+        System.out.println("Code offre stage: ");
+        codeOffreStage = scanner.nextLine();
 
-            private void voirOffreValidee() {
+        System.out.println("ID étudiant: ");
+        etudiant = scanner.nextInt();
 
-                System.out.println("Voir les offres de stage dans l'état \"validée\"");
-
-                try (ResultSet rs = voirOffreStageValidee.executeQuery()) {
-                    while (rs.next()) {
-                        System.out.println(
-                                "\nCode: " + rs.getString(1) + "\n"
-                                        + "Semestre: " + rs.getString(2) + "\n"
-                                        + "Nom entreprise: " + rs.getString(3) + "\n"
-                                        + "Description: " + rs.getString(4) + "\n"
-                        );
-                    }
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                }
-
-            }
-
-            private void voirEtudiantsSansStage () {
-
-                System.out.println("Voir les étudiants qui n'ont pas de stage");
-
-                try (ResultSet rs = voirEtudiantSansStage.executeQuery()) {
-                    while (rs.next()) {
-                        System.out.println(
-                                "\nNom: " + rs.getString(1) + "\n"
-                                        + "Prénom: " + rs.getString(2) + "\n"
-                                        + "Email: " + rs.getString(3) + "\n"
-                                        + "Semestre: " + rs.getString(4) + "\n"
-                                        + "Nb candidature en attente: " + rs.getString(5) + "\n"
-                        );
-                    }
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                }
-
-            }
-
-            private void voirOffreAttribuee () {
-
-                System.out.println("Voir les offres de stage dans l'état \"attribuée\"");
-
-                try (ResultSet rs = voirOffreStageAttribuee.executeQuery()) {
-                    while (rs.next()) {
-                        System.out.println(
-                                "\nCode: " + rs.getString(1) + "\n"
-                                        + "Nom de l'entreprise: " + rs.getString(2) + "\n"
-                                        + "Nom de l'étudiant: " + rs.getString(3) + "\n"
-                                        + "Prénom de l'étudiant: " + rs.getString(4) + "\n"
-                        );
-                    }
-                } catch (SQLException throwables) {
-                    throwables.printStackTrace();
-                }
-
-            }
-
+        try {
+            annulerCandidature.setString(1,codeOffreStage);
+            annulerCandidature.setInt(2,etudiant);
+            annulerCandidature.executeQuery();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
 
     }
+
+
+
+
+
 
     public PreparedStatement getConnecterEtudiant() {
         return connecterEtudiant;
