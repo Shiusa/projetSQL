@@ -920,18 +920,20 @@ EXECUTE PROCEDURE incrementer_nb_candidature();
 
 
 --eleve Q4
-CREATE OR REPLACE FUNCTION projet.get_offres_etudiant(_id_etudiant INTEGER)
+CREATE OR REPLACE FUNCTION projet.get_offres_etudiant(_email VARCHAR(100))
 RETURNS TABLE (
     code_offre VARCHAR(5),
     nom_entreprise VARCHAR(100),
     etat_candidature VARCHAR(100)
 ) AS $$
 BEGIN
-    RETURN QUERY
-    SELECT os.code AS code_offre, e.nom AS nom_entreprise, c.etat AS etat_candidature
-    FROM projet.offres_stage os
-    JOIN projet.entreprise e ON os.entreprise = e.id_entreprise
-    LEFT JOIN projet.candidatures c ON os.id_offre_stage = c.offre_stage AND c.etudiant = _id_etudiant;
+RETURN QUERY
+SELECT os.code AS code_offre, e.nom AS nom_entreprise, c.etat AS etat_candidature
+FROM projet.offres_stage os
+         JOIN projet.entreprise e ON os.entreprise = e.id_entreprise
+         LEFT JOIN projet.candidatures c ON os.id_offre_stage = c.offre_stage
+         JOIN projet.etudiants et ON c.etudiant = et.id_etudiant
+WHERE et.email = _email;
 END;
 $$ LANGUAGE plpgsql;
 

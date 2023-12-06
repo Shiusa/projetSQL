@@ -5,7 +5,9 @@ import java.util.Scanner;
 public class Etudiant {
     private Scanner scanner = new Scanner(System.in);
 
-    private String idEtudiant;
+    private String email;
+
+
 
     private String salt = BCrypt.gensalt();
 
@@ -14,6 +16,7 @@ public class Etudiant {
     private PreparedStatement visualiserOffresStageValides;
     private PreparedStatement rechercherOffreStageMotsCle;
     private PreparedStatement poserCandidature;
+    private PreparedStatement  getIdEtudiant;
 
     private PreparedStatement getOffresEtudiant;
     private PreparedStatement annulerCandidature;
@@ -115,12 +118,16 @@ public class Etudiant {
         System.out.println("Email: ");
         email = scanner.nextLine();
 
+
         System.out.println("Mot de passe: ");
         mdp = BCrypt.hashpw(scanner.nextLine(), salt);
+        setEmail(email);
 
         try {
             connecterEtudiant.setString(1, email);
             connecterEtudiant.setString(2, mdp);
+
+
             connecterEtudiant.executeQuery();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
@@ -177,8 +184,8 @@ public class Etudiant {
     }
 
     private void poserCandidature() {
-        String codeOffreStage, motivation;
-        int etudiant;
+        String codeOffreStage, motivation, email;
+
         System.out.println("Poser une candidature");
 
         System.out.println("Code offre stage: ");
@@ -187,13 +194,12 @@ public class Etudiant {
         System.out.println("Motivation: ");
         motivation = scanner.nextLine();
 
-        System.out.println("ID étudiant: ");
-        etudiant = scanner.nextInt();
+        email = getEmail();
 
         try {
             poserCandidature.setString(1, codeOffreStage);
             poserCandidature.setString(2, motivation);
-            poserCandidature.setInt(3, etudiant);
+            poserCandidature.setString(3, email);
 
             poserCandidature.executeQuery();
         } catch (SQLException throwables) {
@@ -208,6 +214,7 @@ public class Etudiant {
 
         int etudiant;
         System.out.println("Voir ses offres de stage");
+
         System.out.println("ID étudiant: ");
         etudiant = scanner.nextInt();
 
@@ -233,7 +240,7 @@ public class Etudiant {
 
     }
 
-}
+
 
 
 
@@ -268,12 +275,13 @@ public class Etudiant {
         return connecterEtudiant;
     }
 
-    public String getIdEtudiant() {
-        return idEtudiant;
+    public String getEmail() {
+        return email;
     }
 
-    public void setIdEtudiant(String idEtudiant) {
-        this.idEtudiant = idEtudiant;
+    public void setEmail(String email) {
+        this.email = email;
     }
+
 
 }
