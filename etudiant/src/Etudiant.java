@@ -135,7 +135,7 @@ public class Etudiant {
                         setEmail(email);
                     } else {
                         // No rows returned, indicating incorrect email or password
-                        System.out.println("Mauvais email ou mot de passe");
+                        System.out.println("Mauvais email ou mot de passe !");
                     }
                 }
             } catch (SQLException throwables) {
