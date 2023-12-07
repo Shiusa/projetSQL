@@ -1017,7 +1017,7 @@ DECLARE
     offres_rec RECORD;
 BEGIN
     FOR offres_rec IN
-        SELECT os.code, en.nom, ea.etat::VARCHAR(100)
+        SELECT DISTINCT os.code, en.nom, ea.etat::VARCHAR(100)
         FROM projet.offres_stage os, projet.etats ea, projet.etudiants et, projet.entreprise en, projet.candidatures ca
         WHERE (os.entreprise = en.id_entreprise AND ca.offre_stage = os.id_offre_stage AND ca.etudiant = _id_etudiant AND ca.etat = ea.id_etat)
     LOOP
