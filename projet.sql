@@ -700,7 +700,7 @@ $$ LANGUAGE plpgsql;
 
 
 --eleve Q1
-CREATE OR REPLACE FUNCTION projet.visualiser_offres_stage_valides(_semestre semestre)
+/*CREATE OR REPLACE FUNCTION projet.visualiser_offres_stage_valides(_semestre semestre)
 RETURNS TABLE (
     code_offre VARCHAR,
     nom_entreprise VARCHAR,
@@ -733,8 +733,43 @@ BEGIN
     ORDER BY
         os.code;
 END;
-$$ LANGUAGE plpgsql;
+$$ LANGUAGE plpgsql;*/
 
+CREATE OR REPLACE FUNCTION projet.visualiser_offres_stage_valides(_semestre semestre)
+RETURNS SETOF RECORD
+AS $$
+DECLARE
+    sortie RECORD;
+    offre_rec RECORD;
+    offre_mot_rec RECORD;
+    mots VARCHAR;
+    sep VARCHAR;
+    etat_valide INTEGER;
+BEGIN
+    SELECT id_etat FROM projet.etats WHERE (etat = 'validée') INTO etat_valide;
+    FOR offre_rec IN
+        SELECT os.code, en.nom, en.adresse, os.description, os.id_offre_stage
+        FROM projet.offres_stage os, projet.entreprise en
+        WHERE (os.entreprise = en.id_entreprise)
+        AND(os.semestre = _semestre)
+        AND(os.etat = etat_valide)
+    LOOP
+        mots:='';
+        sep:='';
+        FOR offre_mot_rec IN
+            SELECT mc.mot
+            FROM projet.mots_cles mc, projet.offre_mot om
+            WHERE (mc.id_mot_cle = om.mot_cle AND om.offre_stage = offre_rec.id_offre_stage)
+        LOOP
+            mots:=mots || sep || offre_mot_rec.mot;
+            sep:=', ';
+        END LOOP;
+        SELECT offre_rec.code, offre_rec.nom, offre_rec.adresse, offre_rec.description, mots INTO sortie;
+        RETURN NEXT sortie;
+    END LOOP;
+    RETURN;
+end;
+$$ LANGUAGE plpgsql;
 
 --eleve Q2
 CREATE OR REPLACE FUNCTION projet.rechercher_offre_stage_mots_cle(_mot_cle VARCHAR, _semestre semestre)
@@ -968,7 +1003,7 @@ $$ LANGUAGE plpgsql;
 
 
 
-GRANT CONNECT ON DATABASE /**/ TO jasonchu;
+/*GRANT CONNECT ON DATABASE /**/ TO jasonchu;
 GRANT USAGE ON SCHEMA projet to jasonchu;
 
 GRANT SELECT ON ALL TABLES IN SCHEMA projet TO jasonchu;
@@ -979,9 +1014,9 @@ GRANT INSERT ON TABLE projet.offre_mot TO jasonchu;
 GRANT INSERT ON TABLE projet.offres_stage TO jasonchu;
 
 GRANT UPDATE ON TABLE projet.offres_stage TO jasonchu;
-GRANT UPDATE ON TABLE projet.candidatures TO jasonchu;
+GRANT UPDATE ON TABLE projet.candidatures TO jasonchu;*/
 
-SELECT projet.encoder_etudiant ('De','Jean','j.d@student.vinci.be','Q2',?);
+/*SELECT projet.encoder_etudiant ('De','Jean','j.d@student.vinci.be','Q2',?);
 SELECT projet.encoder_etudiant ('Du','Marc','m.d@student.vinci.be','Q1',?);
 
 SELECT projet.encoder_mot_cle('Java');
@@ -1004,5 +1039,5 @@ SELECT projet.poser_candidature ('VIN4', 'motivation', 1);
 SELECT projet.poser_candidature ('VIN5', 'motivation', 2);
 
 SELECT projet.encoder_entreprise('ULB', 'Solbosch', 'ULB', 'mdp');
-SELECT projet.encoder_offre_stage ('stage javascript', 'Q2', 'VIN');
+SELECT projet.encoder_offre_stage ('stage javascript', 'Q2', 'VIN');*/
 --valider stage ULB1

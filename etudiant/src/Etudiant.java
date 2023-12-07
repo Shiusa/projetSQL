@@ -42,7 +42,7 @@ public class Etudiant {
 
         try {
             connecterEtudiant = conn.prepareStatement("SELECT projet.connecter_etudiant (?,?)");
-            visualiserOffresStageValides = conn.prepareStatement("SELECT projet.visualiser_offres_stage_valides (?)");
+            visualiserOffresStageValides = conn.prepareStatement("SELECT * FROM projet.visualiser_offres_stage_valides (?) t(code VARCHAR(5), nom VARCHAR(100), adresse VARCHAR(100), description VARCHAR(1000), mots VARCHAR)");
             rechercherOffreStageMotsCle = conn.prepareStatement("SELECT projet.rechercher_offre_stage_mots_cle (?,?)");
             poserCandidature = conn.prepareStatement("SELECT projet.poser_candidature (?,?,?)");
             getOffresEtudiant = conn.prepareStatement("SELECT projet.get_offres_etudiant(?)");
@@ -149,22 +149,30 @@ public class Etudiant {
 
     public void visualiserOffresStageValides() {
 
-        Semestre semestre;
-
         System.out.println("Visualiser Offres de stage valides");
-        System.out.println("Semestre (Q1/Q2): ");
-        //Rajouter un illegalArgumentException si pas bio
-        String inputSemestre = scanner.nextLine();
-        while (inputSemestre == null) {
-            try {
-                visualiserOffresStageValides.setString(1, inputSemestre);
-            } catch (SQLException throwables) {
-                throwables.printStackTrace();
-            } catch (IllegalArgumentException e) {
-                System.out.println("Saisie invalide");
 
-            }
+        try {
+            visualiserOffresStageValides.setObject(1, getSemestre(), Types.OTHER);
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
+
+        try(ResultSet rs = visualiserOffresStageValides.executeQuery()) {
+            System.out.println();
+            while (rs.next()) {
+                System.out.println(
+                        "\nCode: " + rs.getString(1) + "\n"
+                        +"Entreprise: " + rs.getString(2) + "\n"
+                        +"Adresse: " + rs.getString(3) + "\n"
+                        +"Description: " + rs.getString(4) +"\n"
+                        +"Mots-clés: " + rs.getString(5) +"\n"
+                );
+            }
+            System.out.println();
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
+        }
+
     }
 
     private void rechercherOffreStageMotsCle() {
