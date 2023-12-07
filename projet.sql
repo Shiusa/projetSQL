@@ -772,7 +772,7 @@ end;
 $$ LANGUAGE plpgsql;
 
 --eleve Q2
-CREATE OR REPLACE FUNCTION projet.rechercher_offre_stage_mots_cle(_mot_cle VARCHAR, _semestre semestre)
+/*CREATE OR REPLACE FUNCTION projet.rechercher_offre_stage_mots_cle(_mot_cle VARCHAR, _semestre semestre)
 RETURNS TABLE (
     code_offre VARCHAR,
     nom_entreprise VARCHAR,
@@ -803,6 +803,43 @@ BEGIN
     AND
         os.etat = (SELECT id_etat FROM projet.etats WHERE etat = 'Validée');
 END;
+$$ LANGUAGE plpgsql;*/
+
+CREATE OR REPLACE FUNCTION projet.rechercher_offre_stage_mots_cle(_mot_cle VARCHAR, _semestre semestre)
+RETURNS SETOF RECORD
+AS $$
+DECLARE
+    sortie RECORD;
+    offre_rec RECORD;
+    offre_mot_rec RECORD;
+    mots VARCHAR;
+    sep VARCHAR;
+    etat_valide INTEGER;
+BEGIN
+    SELECT id_etat FROM projet.etats WHERE (etat = 'validée') INTO etat_valide;
+    FOR offre_rec IN
+        SELECT os.code, en.nom, en.adresse, os.description, os.id_offre_stage
+        FROM projet.offres_stage os, projet.entreprise en, projet.mots_cles mc1, projet.offre_mot om1
+        WHERE (os.entreprise = en.id_entreprise AND om1.offre_stage = os.id_offre_stage AND om1.mot_cle = mc1.id_mot_cle)
+        AND(os.semestre = _semestre)
+        AND(os.etat = etat_valide)
+        AND(mc1.mot = _mot_cle)
+    LOOP
+        mots:='';
+        sep:='';
+        FOR offre_mot_rec IN
+            SELECT mc.mot
+            FROM projet.mots_cles mc, projet.offre_mot om
+            WHERE (mc.id_mot_cle = om.mot_cle AND om.offre_stage = offre_rec.id_offre_stage)
+        LOOP
+            mots:=mots || sep || offre_mot_rec.mot;
+            sep:=', ';
+        END LOOP;
+        SELECT offre_rec.code, offre_rec.nom, offre_rec.adresse, offre_rec.description, mots INTO sortie;
+        RETURN NEXT sortie;
+    END LOOP;
+    RETURN;
+end;
 $$ LANGUAGE plpgsql;
 
 

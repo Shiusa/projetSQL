@@ -43,7 +43,7 @@ public class Etudiant {
         try {
             connecterEtudiant = conn.prepareStatement("SELECT projet.connecter_etudiant (?,?)");
             visualiserOffresStageValides = conn.prepareStatement("SELECT * FROM projet.visualiser_offres_stage_valides (?) t(code VARCHAR(5), nom VARCHAR(100), adresse VARCHAR(100), description VARCHAR(1000), mots VARCHAR)");
-            rechercherOffreStageMotsCle = conn.prepareStatement("SELECT projet.rechercher_offre_stage_mots_cle (?,?)");
+            rechercherOffreStageMotsCle = conn.prepareStatement("SELECT * FROM projet.rechercher_offre_stage_mots_cle (?,?) t(code VARCHAR(5), nom VARCHAR(100), adresse VARCHAR(100), description VARCHAR(1000), mots VARCHAR)");
             poserCandidature = conn.prepareStatement("SELECT projet.poser_candidature (?,?,?)");
             getOffresEtudiant = conn.prepareStatement("SELECT projet.get_offres_etudiant(?)");
             annulerCandidature = conn.prepareStatement("SELECT projet.annuler_candidature(?,?)");
@@ -158,7 +158,6 @@ public class Etudiant {
         }
 
         try(ResultSet rs = visualiserOffresStageValides.executeQuery()) {
-            System.out.println();
             while (rs.next()) {
                 System.out.println(
                         "\nCode: " + rs.getString(1) + "\n"
@@ -168,7 +167,6 @@ public class Etudiant {
                         +"Mots-clés: " + rs.getString(5) +"\n"
                 );
             }
-            System.out.println();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
@@ -178,26 +176,30 @@ public class Etudiant {
     private void rechercherOffreStageMotsCle() {
 
         String motCle;
-        Semestre semestre;
 
-        System.out.println("Encoder un mot-clé");
+        System.out.println("Rechercher offre stage par mot-clé");
         System.out.println("Mot-clé: ");
         motCle = scanner.nextLine();
 
-        System.out.println("Encoder semestre");
-        System.out.println("Semestre (Q1/Q2): ");
-
-        String inputSemestre = scanner.nextLine();
-
         try {
             rechercherOffreStageMotsCle.setString(1, motCle);
-            rechercherOffreStageMotsCle.setString(2, inputSemestre);
-            rechercherOffreStageMotsCle.executeQuery();
+            rechercherOffreStageMotsCle.setObject(2, getSemestre(), Types.OTHER);
         } catch (SQLException throwables) {
             throwables.printStackTrace();
-        } catch (IllegalArgumentException e) {
-            System.out.println("Saisie invalide");
+        }
 
+        try(ResultSet rs = rechercherOffreStageMotsCle.executeQuery()) {
+            while (rs.next()) {
+                System.out.println(
+                        "\nCode: " + rs.getString(1) + "\n"
+                        +"Entreprise: " + rs.getString(2) + "\n"
+                        +"Adresse: " + rs.getString(3) + "\n"
+                        +"Description: " + rs.getString(4) +"\n"
+                        +"Mots-clés: " + rs.getString(5) +"\n"
+                );
+            }
+        } catch (SQLException throwables) {
+            throwables.printStackTrace();
         }
     }
 
