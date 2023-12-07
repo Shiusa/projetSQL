@@ -204,7 +204,8 @@ public class Etudiant {
     }
 
     private void poserCandidature() {
-        String codeOffreStage, motivation, email;
+
+        String codeOffreStage, motivation;
 
         System.out.println("Poser une candidature");
 
@@ -214,18 +215,14 @@ public class Etudiant {
         System.out.println("Motivation: ");
         motivation = scanner.nextLine();
 
-        email = getEmail();
-
         try {
             poserCandidature.setString(1, codeOffreStage);
             poserCandidature.setString(2, motivation);
-            poserCandidature.setString(3, email);
-
+            poserCandidature.setInt(3, getIdEtudiant());
             poserCandidature.executeQuery();
         } catch (SQLException throwables) {
             throwables.printStackTrace();
         }
-
 
     }
 
