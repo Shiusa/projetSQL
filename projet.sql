@@ -992,7 +992,7 @@ EXECUTE PROCEDURE incrementer_nb_candidature();
 
 
 --eleve Q4
-CREATE OR REPLACE FUNCTION projet.get_offres_etudiant(_email VARCHAR(100))
+/*CREATE OR REPLACE FUNCTION projet.get_offres_etudiant(_email VARCHAR(100))
 RETURNS TABLE (
     code_offre VARCHAR(5),
     nom_entreprise VARCHAR(100),
@@ -1007,6 +1007,25 @@ FROM projet.offres_stage os
          JOIN projet.etudiants et ON c.etudiant = et.id_etudiant
 WHERE et.email = _email;
 END;
+$$ LANGUAGE plpgsql;*/
+
+CREATE OR REPLACE FUNCTION projet.get_offres_etudiant(_id_etudiant INTEGER)
+RETURNS SETOF RECORD
+AS $$
+DECLARE
+    sortie RECORD;
+    offres_rec RECORD;
+BEGIN
+    FOR offres_rec IN
+        SELECT os.code, en.nom, ea.etat::VARCHAR(100)
+        FROM projet.offres_stage os, projet.etats ea, projet.etudiants et, projet.entreprise en, projet.candidatures ca
+        WHERE (os.entreprise = en.id_entreprise AND ca.offre_stage = os.id_offre_stage AND ca.etudiant = _id_etudiant AND ca.etat = ea.id_etat)
+    LOOP
+        SELECT offres_rec.code, offres_rec.nom, offres_rec.etat INTO sortie;
+        RETURN NEXT sortie;
+    END LOOP;
+    RETURN;
+end;
 $$ LANGUAGE plpgsql;
 
 

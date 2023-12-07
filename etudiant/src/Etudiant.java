@@ -45,7 +45,7 @@ public class Etudiant {
             visualiserOffresStageValides = conn.prepareStatement("SELECT * FROM projet.visualiser_offres_stage_valides (?) t(code VARCHAR(5), nom VARCHAR(100), adresse VARCHAR(100), description VARCHAR(1000), mots VARCHAR)");
             rechercherOffreStageMotsCle = conn.prepareStatement("SELECT * FROM projet.rechercher_offre_stage_mots_cle (?,?) t(code VARCHAR(5), nom VARCHAR(100), adresse VARCHAR(100), description VARCHAR(1000), mots VARCHAR)");
             poserCandidature = conn.prepareStatement("SELECT projet.poser_candidature (?,?,?)");
-            getOffresEtudiant = conn.prepareStatement("SELECT projet.get_offres_etudiant(?)");
+            getOffresEtudiant = conn.prepareStatement("SELECT * FROM projet.get_offres_etudiant(?) t(code VARCHAR(5), nom VARCHAR(100), etat VARCHAR(100))");
             annulerCandidature = conn.prepareStatement("SELECT projet.annuler_candidature(?,?)");
             recupererInfoEtudiant = conn.prepareStatement("SELECT * FROM projet.etudiants WHERE email=?");
 
@@ -229,14 +229,11 @@ public class Etudiant {
 
     private void getOffresEtudiant() {
 
-        int etudiant;
         System.out.println("Voir ses offres de stage");
 
-        System.out.println("ID étudiant: ");
-        etudiant = scanner.nextInt();
 
         try {
-            getOffresEtudiant.setInt(1, etudiant);
+            getOffresEtudiant.setInt(1, getIdEtudiant());
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -245,8 +242,8 @@ public class Etudiant {
             while (rs.next()) {
                 System.out.println(
                         "\nCode: " + rs.getString(1) + "\n"
-                                + "Entreprise: " + rs.getString(2) + "\n"
-                                + "Etat candidature: " + rs.getString(3) + "\n"
+                        + "Entreprise: " + rs.getString(2) + "\n"
+                        + "Etat candidature: " + rs.getString(3) + "\n"
 
                 );
             }
