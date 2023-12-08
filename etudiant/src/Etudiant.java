@@ -31,8 +31,10 @@ public class Etudiant {
             System.exit(1);
         }
 
-        //String url="jdbc:postgresql://172.24.2.6:5432/trongnguyen";
-        String url = "jdbc:postgresql://localhost:5432/postgres";
+        String url="jdbc:postgresql://172.24.2.6:5432/dbtrongnguyen";
+        //String url = "jdbc:postgresql://localhost:5432/postgres";
+        //login jsp
+        //mdp jsp
         try {
             conn = DriverManager.getConnection(url, "postgres", "test");
         } catch (SQLException e) {

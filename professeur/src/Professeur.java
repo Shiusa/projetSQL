@@ -27,10 +27,12 @@ public class Professeur {
             System.exit(1);
         }
 
-        //String url="jdbc:postgresql://172.24.2.6:5432/trongnguyen";
-        String url="jdbc:postgresql://localhost:5432/postgres";
+        String url="jdbc:postgresql://172.24.2.6:5432/dbtrongnguyen";
+        //String url="jdbc:postgresql://localhost:5432/postgres";
+        //login trongnguyen
+        //mdp AWZJRQDP2
         try {
-            conn= DriverManager.getConnection(url,"postgres","test");
+            conn= DriverManager.getConnection(url,"trongnguyen","AWZJRQDP2");
         } catch (SQLException e) {
             System.out.println("Impossible de joindre le server !");
             System.exit(1);
