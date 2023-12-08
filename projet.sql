@@ -1073,7 +1073,17 @@ GRANT INSERT ON TABLE projet.offre_mot TO jasonchu;
 GRANT INSERT ON TABLE projet.offres_stage TO jasonchu;
 
 GRANT UPDATE ON TABLE projet.offres_stage TO jasonchu;
-GRANT UPDATE ON TABLE projet.candidatures TO jasonchu;*/
+GRANT UPDATE ON TABLE projet.candidatures TO jasonchu;
+
+GRANT CONNECT ON DATABASE /**/ TO antoine;
+GRANT USAGE ON SCHEMA projet to antoine;
+
+GRANT SELECT ON ALL TABLES IN SCHEMA projet TO antoine;
+
+GRANT INSERT ON TABLE projet.candidatures TO antoine;
+
+GRANT UPDATE ON TABLE projet.offres_stage TO antoine;
+GRANT UPDATE ON TABLE projet.candidatures TO antoine;*/
 
 /*SELECT projet.encoder_etudiant ('De','Jean','j.d@student.vinci.be','Q2',?);
 SELECT projet.encoder_etudiant ('Du','Marc','m.d@student.vinci.be','Q1',?);
