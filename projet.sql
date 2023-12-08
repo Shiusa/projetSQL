@@ -1084,7 +1084,6 @@ GRANT SELECT ON ALL TABLES IN SCHEMA projet TO antoinedrionduchapoi;
 
 GRANT INSERT ON TABLE projet.candidatures TO antoinedrionduchapoi;
 
---GRANT UPDATE ON TABLE projet.offres_stage TO antoinedrionduchapoi;
 GRANT UPDATE ON TABLE projet.candidatures TO antoinedrionduchapoi;
 
 
