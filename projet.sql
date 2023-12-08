@@ -1085,14 +1085,18 @@ GRANT INSERT ON TABLE projet.candidatures TO antoinedrionduchapoi;
 GRANT UPDATE ON TABLE projet.offres_stage TO antoinedrionduchapoi;
 GRANT UPDATE ON TABLE projet.candidatures TO antoinedrionduchapoi;
 
-/*SELECT projet.encoder_etudiant ('De','Jean','j.d@student.vinci.be','Q2',?);
-SELECT projet.encoder_etudiant ('Du','Marc','m.d@student.vinci.be','Q1',?);
+
+--mdp: test
+SELECT projet.encoder_etudiant ('De','Jean','j.d@student.vinci.be','Q2','$2a$10$WEylaykKoqvbNbuPSfhBQ.y2ceGuCOL2l.Q22vy6ONRsZ4h3PR/kW');
+--mdp: test
+SELECT projet.encoder_etudiant ('Du','Marc','m.d@student.vinci.be','Q1','$2a$10$WEylaykKoqvbNbuPSfhBQ.y2ceGuCOL2l.Q22vy6ONRsZ4h3PR/kW');
 
 SELECT projet.encoder_mot_cle('Java');
 SELECT projet.encoder_mot_cle('Web');
 SELECT projet.encoder_mot_cle('Python');
 
-SELECT projet.encoder_entreprise('VINCI', 'Clos Chapelle-aux-Champs 43', 'VIN', 'mdp');
+--mdp: test
+SELECT projet.encoder_entreprise('VINCI', 'Clos Chapelle-aux-Champs 43', 'vin@vin.be', 'VIN', '$2a$10$/UmzxfeXXYmV5Dp9cmEuX.ve0FKVggb1idLG07Cy7nARNQYgny0tq');
 
 SELECT projet.encoder_offre_stage ('stage SAP', 'Q2', 'VIN');
 SELECT projet.encoder_offre_stage ('stage BI', 'Q2', 'VIN');
@@ -1101,12 +1105,18 @@ SELECT projet.encoder_offre_stage ('stage IA', 'Q2', 'VIN');
 SELECT projet.encoder_offre_stage ('stage mobile', 'Q1', 'VIN');
 
 -- valider stage VIN1, VIN4, VIN5
-SELECT projet.ajouter_mot_cle_offre_stage ('VIN3', 'Jave', 'VIN');
-SELECT projet.ajouter_mot_cle_offre_stage ('VIN5', 'Jave', 'VIN');
+SELECT projet.valider_offre_stage('VIN1');
+SELECT projet.valider_offre_stage('VIN4');
+SELECT projet.valider_offre_stage('VIN5');
 
-SELECT projet.poser_candidature ('VIN4', 'motivation', 1);
-SELECT projet.poser_candidature ('VIN5', 'motivation', 2);
+SELECT projet.ajouter_mot_cle_offre_stage ('VIN3', 'Java', 'VIN');
+SELECT projet.ajouter_mot_cle_offre_stage ('VIN5', 'Java', 'VIN');
 
-SELECT projet.encoder_entreprise('ULB', 'Solbosch', 'ULB', 'mdp');
-SELECT projet.encoder_offre_stage ('stage javascript', 'Q2', 'VIN');*/
+SELECT projet.poser_candidature ('VIN4', 'jeanVIN4motivation', 1);
+SELECT projet.poser_candidature ('VIN5', 'marcVIN5motivation', 2);
+
+SELECT projet.encoder_entreprise('ULB', 'Solbosch', 'ulb@ulb.be', 'ULB', '$2a$10$qwFhCsYLvXm3Gh08kNshIeFHULpyXgr8AsFFxzd3m6HiYkbyJWVfa');
+SELECT projet.encoder_offre_stage ('stage javascript', 'Q2', 'ULB');
+
 --valider stage ULB1
+SELECT projet.valider_offre_stage('ULB1');
