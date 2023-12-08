@@ -36,7 +36,7 @@ public class Etudiant {
         //login jsp
         //mdp jsp
         try {
-            conn = DriverManager.getConnection(url, "postgres", "test");
+            conn = DriverManager.getConnection(url, "trongnguyen", "AWZJRQDP2");
         } catch (SQLException e) {
             System.out.println("Impossible de joindre le server !");
             System.exit(1);
