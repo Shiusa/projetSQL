@@ -1062,7 +1062,7 @@ $$ LANGUAGE plpgsql;
 
 
 
-/*GRANT CONNECT ON DATABASE /**/ TO jasonchu;
+GRANT CONNECT ON DATABASE dbtrongnguyen TO jasonchu;
 GRANT USAGE ON SCHEMA projet to jasonchu;
 
 GRANT SELECT ON ALL TABLES IN SCHEMA projet TO jasonchu;
@@ -1075,15 +1075,15 @@ GRANT INSERT ON TABLE projet.offres_stage TO jasonchu;
 GRANT UPDATE ON TABLE projet.offres_stage TO jasonchu;
 GRANT UPDATE ON TABLE projet.candidatures TO jasonchu;
 
-GRANT CONNECT ON DATABASE /**/ TO antoine;
-GRANT USAGE ON SCHEMA projet to antoine;
+GRANT CONNECT ON DATABASE dbtrongnguyen TO antoinedrionduchapoi;
+GRANT USAGE ON SCHEMA projet to antoinedrionduchapoi;
 
-GRANT SELECT ON ALL TABLES IN SCHEMA projet TO antoine;
+GRANT SELECT ON ALL TABLES IN SCHEMA projet TO antoinedrionduchapoi;
 
-GRANT INSERT ON TABLE projet.candidatures TO antoine;
+GRANT INSERT ON TABLE projet.candidatures TO antoinedrionduchapoi;
 
-GRANT UPDATE ON TABLE projet.offres_stage TO antoine;
-GRANT UPDATE ON TABLE projet.candidatures TO antoine;*/
+GRANT UPDATE ON TABLE projet.offres_stage TO antoinedrionduchapoi;
+GRANT UPDATE ON TABLE projet.candidatures TO antoinedrionduchapoi;
 
 /*SELECT projet.encoder_etudiant ('De','Jean','j.d@student.vinci.be','Q2',?);
 SELECT projet.encoder_etudiant ('Du','Marc','m.d@student.vinci.be','Q1',?);
