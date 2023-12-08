@@ -1068,6 +1068,8 @@ GRANT USAGE ON SCHEMA projet to jasonchu;
 GRANT SELECT ON ALL TABLES IN SCHEMA projet TO jasonchu;
 
 GRANT SELECT ON projet.voir_mots_cles TO jasonchu;
+GRANT SELECT ON projet.offres_stage TO jasonchu;
+GRANT USAGE, SELECT ON SEQUENCE projet.offres_stage_id_offre_stage_seq TO jasonchu;
 
 GRANT INSERT ON TABLE projet.offre_mot TO jasonchu;
 GRANT INSERT ON TABLE projet.offres_stage TO jasonchu;
