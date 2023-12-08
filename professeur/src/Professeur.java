@@ -6,7 +6,7 @@ public class Professeur {
 
     private Scanner scanner = new Scanner(System.in);
 
-    private String salt = BCrypt.gensalt();
+    //private String salt = BCrypt.gensalt();
 
     private Connection conn = null;
     private PreparedStatement encoderEtudiant;
@@ -109,6 +109,8 @@ public class Professeur {
         String nom, prenom, mail, mdp;
         Semestre semestre = null;
 
+        String salt = BCrypt.gensalt();
+
         System.out.println("Encoder un étudiant");
         System.out.println("Nom: ");
         //scanner.next();
@@ -148,6 +150,8 @@ public class Professeur {
     public void encoderEntreprise() {
 
         String nom, adresse, mail, identifiant, mdp;
+
+        String salt = BCrypt.gensalt();
 
         System.out.println("Encoder une entreprise");
         System.out.println("Nom: ");
