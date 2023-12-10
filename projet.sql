@@ -389,7 +389,7 @@ BEGIN
     SELECT etat FROM projet.candidatures WHERE (projet.candidatures.etudiant = v_id_etudiant AND projet.candidatures.code_offre_stage = _code_offre_stage) INTO candidature_etat;
 
     IF offre_etat != etat_validee
-        THEN RAISE 'Vous n''avez pas d''offre ayant ce code';
+        THEN RAISE 'Offre non validée ou déjà attribuée';
     END IF;
     IF candidature_etat != etat_attente
         THEN RAISE 'La candidature n''est pas en attente';
