@@ -75,23 +75,6 @@ INSERT INTO projet.etats (etat) VALUES ('acceptée');
 INSERT INTO projet.etats (etat) VALUES ('refusée');
 
 
-/*CREATE OR REPLACE FUNCTION get_offres_non_validees()
-RETURNS TABLE (
-    code VARCHAR(5),
-    semestre semestre,
-    entreprise_nom VARCHAR(100),
-    description_etat VARCHAR(100)
-) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT os.code, os.semestre, e.nom AS entreprise_nom, et.etat AS description_etat
-    FROM projet.offres_stage os
-    JOIN projet.etats et ON os.etat = et.id_etat
-    JOIN projet.entreprise e ON os.entreprise = e.id_entreprise
-    WHERE et.etat = 'non validée';
-END;
-$$ LANGUAGE plpgsql;*/
-
 --professeur Q1
 CREATE OR REPLACE FUNCTION projet.encoder_etudiant(_nom VARCHAR(100), _prenom VARCHAR(100), _email VARCHAR(100), _semestre semestre, _mdp VARCHAR(100))
 RETURNS VOID AS $$
@@ -166,22 +149,6 @@ BEGIN
 end;
 $$ LANGUAGE plpgsql;
 
-/*CREATE OR REPLACE FUNCTION valider_offre_stage_trigger()
-RETURNS TRIGGER
-AS $$
-BEGIN
-    IF (OLD.etat <> (SELECT id_etat FROM projet.etats WHERE etat = 'non validée'))
-    THEN
-        RAISE 'ce stage ne peut pas etre validée';
-    end if;
-    RETURN NEW;
-end;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER valider_offre_stage_trigger BEFORE UPDATE ON projet.offres_stage
-FOR EACH ROW
-EXECUTE PROCEDURE valider_offre_stage_trigger ();*/
-
 
 --professeur Q6
 CREATE OR REPLACE VIEW projet.get_offres_validees AS
@@ -220,13 +187,6 @@ DECLARE
     etat_defaut INTEGER;
     code_offre  VARCHAR(5);
 BEGIN
-    /*IF EXISTS (
-        SELECT os.* FROM projet.offres_stage os
-        WHERE (os.entreprise = _entreprise)
-        AND(os.semestre = _semestre)
-        AND (os.etat = (SELECT etat FROM projet.etats WHERE etats.etat = 'attribuée')))
-        THEN RAISE 'Offre de stage déjà attribuée durant ce semestre';
-    END IF;*/
 
     SELECT count(os.id_offre_stage)+1 FROM projet.offres_stage os WHERE (os.entreprise = _entreprise) INTO numero_code;
     SELECT et.id_etat FROM projet.etats et WHERE et.etat = 'non validée' INTO etat_defaut;
@@ -328,42 +288,6 @@ EXECUTE PROCEDURE ajouter_mot_cle_offre_stage_trigger();
 
 
 --entreprise Q4
-/*CREATE OR REPLACE FUNCTION projet.voir_offres_stages_entreprise(_id_entreprise CHAR(3))
-RETURNS TABLE (
-    code_offre VARCHAR,
-    description VARCHAR,
-    semestre semestre,
-    etat VARCHAR,
-    nb_candidatures_en_attente BIGINT,
-    nom_etudiant_attribue TEXT
-)
-AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        o.code,
-        o.description,
-        o.semestre,
-        e.etat,
-        COUNT(c.offre_stage) AS nb_candidatures_en_attente,
-        COALESCE(CONCAT(et.nom, ' ', et.prenom), 'pas attribuée') AS nom_etudiant_attribue
-    FROM
-        projet.offres_stage o
-    JOIN
-        projet.etats e ON o.etat = e.id_etat
-    LEFT JOIN
-        projet.candidatures c ON o.id_offre_stage = c.offre_stage AND c.etat IS NULL
-    LEFT JOIN
-        projet.etudiants et ON o.etudiant = et.id_etudiant
-    WHERE
-        o.entreprise = _id_entreprise
-    GROUP BY
-        o.code, o.description, o.semestre, e.etat, et.nom, et.prenom;
-
-    RETURN;
-END;
-$$ LANGUAGE plpgsql;*/
-
 CREATE OR REPLACE FUNCTION projet.voir_offres_stages_entreprise(_entreprise CHAR(3))
 RETURNS SETOF RECORD
 AS $$
@@ -425,114 +349,6 @@ $$ LANGUAGE plpgsql;
 
 
 --entreprise Q6
-/*CREATE OR REPLACE FUNCTION projet.selectionner_etudiant_offre_stage(_id_entreprise CHAR(3), _code_offre VARCHAR, _email_etudiant VARCHAR)
-    RETURNS VOID
-AS $$
-DECLARE
-    v_offre_id INTEGER;
-    v_etudiant_id INTEGER;
-    v_semestre semestre;
-    v_entreprise CHAR(3);
-BEGIN
-    -- Vérifier si l'offre de stage existe, appartient à l'entreprise, et est dans l'état "validée"
-    SELECT
-        o.id_offre_stage, o.semestre, o.entreprise
-    INTO
-        v_offre_id, v_semestre, v_entreprise
-    FROM
-        projet.offres_stage o
-    WHERE
-            o.code = _code_offre
-      AND o.etat = (SELECT id_etat FROM projet.etats WHERE etat = 'validée')
-      AND o.entreprise = _id_entreprise;
-
-    IF v_offre_id IS NULL THEN
-        RAISE EXCEPTION 'L''offre de stage spécifiée ne peut pas être attribuée.';
-    END IF;
-
-    -- Vérifier si l'étudiant a une candidature en attente pour cette offre
-    SELECT
-        e.id_etudiant
-    INTO
-        v_etudiant_id
-    FROM
-        projet.etudiants e
-            JOIN
-        projet.candidatures c ON e.id_etudiant = c.etudiant
-    WHERE
-            e.email = _email_etudiant
-      AND c.offre_stage = v_offre_id
-      AND c.etat = (SELECT id_etat FROM projet.etats WHERE etat = 'en attente');
-
-    IF v_etudiant_id IS NULL THEN
-        RAISE EXCEPTION 'L''étudiant spécifié n''a pas de candidature en attente pour cette offre.';
-    END IF;
-
-    -- Mettre à jour l'état de l'offre de stage à "attribuée"
-    UPDATE
-        projet.offres_stage
-    SET
-        etat = (SELECT id_etat FROM projet.etats WHERE etat = 'attribuée')
-    WHERE
-            id_offre_stage = v_offre_id;
-
-    -- Mettre à jour l'état de la candidature de l'étudiant à "acceptée"
-    UPDATE
-        projet.candidatures
-    SET
-        etat = (SELECT id_etat FROM projet.etats WHERE etat = 'acceptée')
-    WHERE
-            offre_stage = v_offre_id AND etudiant = v_etudiant_id;
-
-    -- Mettre à jour l'état des autres candidatures en attente de l'étudiant à "annulée"
-    UPDATE
-        projet.candidatures
-    SET
-        etat = (SELECT id_etat FROM projet.etats WHERE etat = 'annulée')
-    WHERE
-            etudiant = v_etudiant_id AND offre_stage <> v_offre_id;
-
-    -- Mettre à jour l'état des autres candidatures en attente pour cette offre à "refusée"
-    UPDATE
-        projet.candidatures
-    SET
-        etat = (SELECT id_etat FROM projet.etats WHERE etat = 'refusée')
-    WHERE
-            offre_stage = v_offre_id;
-
-    -- Mettre à jour l'état des autres offres de l'entreprise durant ce semestre à "annulée"
-    UPDATE
-        projet.offres_stage
-    SET
-        etat = (SELECT id_etat FROM projet.etats WHERE etat = 'annulée')
-    WHERE
-            entreprise = v_entreprise
-      AND semestre = v_semestre
-      AND id_offre_stage <> v_offre_id
-      AND etat <> (SELECT id_etat FROM projet.etats WHERE etat = 'annulée');
-
-    -- Mettre à jour l'état des candidatures en attente pour les autres offres annulées à "refusée"
-    UPDATE
-        projet.candidatures
-    SET
-        etat = (SELECT id_etat FROM projet.etats WHERE etat = 'refusée')
-    WHERE
-            offre_stage IN (
-            SELECT
-                id_offre_stage
-            FROM
-                projet.offres_stage
-            WHERE
-                    entreprise = v_entreprise
-              AND semestre = v_semestre
-              AND id_offre_stage <> v_offre_id
-              AND etat = (SELECT id_etat FROM projet.etats WHERE etat = 'annulée')
-        );
-
-    RAISE NOTICE 'L''offre de stage a été attribuée à l''étudiant avec succès.';
-END;
-$$ LANGUAGE plpgsql;*/
-
 CREATE OR REPLACE FUNCTION projet.selectionner_etudiant_offre_stage(_entreprise CHAR(3), _code_offre_stage VARCHAR(5), _email_etudiant VARCHAR(100))
 RETURNS VOID
 AS $$
@@ -700,41 +516,6 @@ $$ LANGUAGE plpgsql;
 
 
 --eleve Q1
-/*CREATE OR REPLACE FUNCTION projet.visualiser_offres_stage_valides(_semestre semestre)
-RETURNS TABLE (
-    code_offre VARCHAR,
-    nom_entreprise VARCHAR,
-    adresse_entreprise VARCHAR,
-    description TEXT,
-    mots_cles TEXT
-) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT
-        os.code AS code_offre,
-        e.nom AS nom_entreprise,
-        e.adresse AS adresse_entreprise,
-        os.description,
-        mc.mot AS mots_cles -- pour concaténer les mots-clés
-    FROM
-        projet.offres_stage os
-    JOIN
-        projet.entreprise e ON os.entreprise = e.id_entreprise
-    JOIN
-        projet.offre_mot om ON os.id_offre_stage = om.offre_stage
-    JOIN
-        projet.mots_cles mc ON om.mot_cle = mc.id_mot_cle
-    JOIN
-        projet.etats et ON os.etat = et.id_etat
-    WHERE
-        et.etat = 'Validée' AND os.semestre = _semestre
-    GROUP BY
-        os.code, e.nom, e.adresse, os.description, mc.mot
-    ORDER BY
-        os.code;
-END;
-$$ LANGUAGE plpgsql;*/
-
 CREATE OR REPLACE FUNCTION projet.visualiser_offres_stage_valides(_semestre semestre)
 RETURNS SETOF RECORD
 AS $$
@@ -772,39 +553,6 @@ end;
 $$ LANGUAGE plpgsql;
 
 --eleve Q2
-/*CREATE OR REPLACE FUNCTION projet.rechercher_offre_stage_mots_cle(_mot_cle VARCHAR, _semestre semestre)
-RETURNS TABLE (
-    code_offre VARCHAR,
-    nom_entreprise VARCHAR,
-    adresse_entreprise VARCHAR,
-    description TEXT,
-    mots_cles TEXT
-) AS $$
-BEGIN
-    RETURN QUERY
-    SELECT os.code AS code_offre,
-    e.nom AS nom_entreprise,
-    e.adresse AS adresse_entreprise,
-    os.description,
-    mc.mot AS mots_cles
-
-    FROM
-        projet.offres_stage os
-    JOIN
-        projet.offre_mot om ON os.id_offre_stage = om.offre_stage
-    JOIN
-        projet.mots_cles mc ON om.mot_cle = mc.id_mot_cle
-    JOIN
-        projet.entreprise e ON os.entreprise = e.id_entreprise
-    WHERE
-        mc.mot = _mot_cle
-    AND
-        os.semestre = _semestre
-    AND
-        os.etat = (SELECT id_etat FROM projet.etats WHERE etat = 'Validée');
-END;
-$$ LANGUAGE plpgsql;*/
-
 CREATE OR REPLACE FUNCTION projet.rechercher_offre_stage_mots_cle(_mot_cle VARCHAR, _semestre semestre)
 RETURNS SETOF RECORD
 AS $$
@@ -844,74 +592,6 @@ $$ LANGUAGE plpgsql;
 
 
 --eleve Q3
-/*CREATE OR REPLACE FUNCTION projet.poser_candidature(_code_stage CHAR(8), _motivations TEXT) RETURNS VOID AS $$
-BEGIN
-    INSERT INTO projet.candidatures (code_offre_stage, motivations)
-    VALUES (_code_stage, _motivations);
-END;
-$$ LANGUAGE plpgsql;
-
-
-CREATE OR REPLACE FUNCTION projet.poser_candidature_trigger () RETURNS TRIGGER AS $$
-DECLARE
-BEGIN
-    -- Vérifie si l'étudiant n'a pas déjà une candidature acceptée
-     IF EXISTS (SELECT * FROM projet.etudiants et
-        JOIN
-         candidatures c on et.id_etudiant = c.etudiant
-        join
-         etats e on c.etat = e.id_etat
-        WHERE
-            e.etat = 'validée')
-    THEN
-        RAISE 'Déjà une candidature acceptée';
-    END IF;
-
-    -- Vérifier s'il a déjà posé une candidature pour cette offre
-    IF EXISTS (
-        SELECT *
-        FROM
-            projet.candidatures ca
-        JOIN
-            etudiants e on e.id_etudiant = ca.etudiant
-        JOIN offres_stage o on o.id_offre_stage = ca.offre_stage
-        WHERE candidatures.code_offre_stage = NEW.code_offre_stage
-    )
-    THEN
-        RAISE 'Vous avez déjà posé une candidature pour cette offre.';
-    END IF;
-
-    -- Vérifier si l'offre n'est pas déjà validée avec un autre étudiant
-        IF EXISTS (
-            SELECT * FROM offres_stage os
-            JOIN projet.etats e ON os.etat = e.id_etat
-            WHERE e.etat = 'validée'
-            )
-        THEN
-            RAISE 'Offre déjà validée par autrui';
-        END IF;
-
-      -- Vérifier si l'offre correspond au bon semestre
-    IF NOT EXISTS (
-        SELECT *
-        FROM projet.offres_stage os
-        JOIN candidatures c on os.id_offre_stage = c.offre_stage
-        JOIN etudiants e on e.id_etudiant = c.etudiant
-        WHERE os.id_offre_stage = NEW.code_offre_stage
-        AND semestre = e.semestre
-    )
-    THEN
-        RAISE 'L''offre ne correspond pas au bon semestre.';
-    END IF;
-
-    RETURN NEW;
-END;
-$$ LANGUAGE plpgsql;
-
-CREATE TRIGGER poser_candidature_trigger BEFORE INSERT ON projet.candidatures
-    FOR EACH ROW
-    EXECUTE PROCEDURE projet.poser_candidature_trigger();*/
-
 CREATE OR REPLACE FUNCTION projet.poser_candidature(_code_stage VARCHAR(5), _motivations TEXT, _etudiant INTEGER)
 RETURNS VOID
 AS $$
@@ -992,23 +672,6 @@ EXECUTE PROCEDURE incrementer_nb_candidature();
 
 
 --eleve Q4
-/*CREATE OR REPLACE FUNCTION projet.get_offres_etudiant(_email VARCHAR(100))
-RETURNS TABLE (
-    code_offre VARCHAR(5),
-    nom_entreprise VARCHAR(100),
-    etat_candidature VARCHAR(100)
-) AS $$
-BEGIN
-RETURN QUERY
-SELECT os.code AS code_offre, e.nom AS nom_entreprise, c.etat AS etat_candidature
-FROM projet.offres_stage os
-         JOIN projet.entreprise e ON os.entreprise = e.id_entreprise
-         LEFT JOIN projet.candidatures c ON os.id_offre_stage = c.offre_stage
-         JOIN projet.etudiants et ON c.etudiant = et.id_etudiant
-WHERE et.email = _email;
-END;
-$$ LANGUAGE plpgsql;*/
-
 CREATE OR REPLACE FUNCTION projet.get_offres_etudiant(_id_etudiant INTEGER)
 RETURNS SETOF RECORD
 AS $$
@@ -1029,7 +692,6 @@ end;
 $$ LANGUAGE plpgsql;
 
 
---eleve Q5
 --eleve Q5
 CREATE OR REPLACE FUNCTION projet.annuler_candidature(_code_offre_stage VARCHAR(5), _email_etudiant VARCHAR(100))
 RETURNS VOID AS $$
