@@ -55,6 +55,8 @@ public class Professeur {
 
     public void start() {
 
+        System.out.println("Application Professeur");
+
         int option;
 
         while(true) {
