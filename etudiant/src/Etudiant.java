@@ -7,7 +7,7 @@ public class Etudiant {
 
     private String email;
     private Semestre semestre;
-    private int idEtudiant;
+    private Integer idEtudiant;
 
     private Connection conn = null;
     private PreparedStatement visualiserOffresStageValides;
@@ -68,7 +68,7 @@ public class Etudiant {
             System.out.println("3 - Poser une candidature");
             System.out.println("4 - Voir les offres de stage de l'étudiant");
             System.out.println("5 - Annuler une candidature");
-
+            System.out.println("0 - Se déconnecter");
 
             try {
                 option = scanner.nextInt();
@@ -78,7 +78,7 @@ public class Etudiant {
                 System.out.println("Entrer un entier!");
                 continue;
             }
-            if (option < 1 || option > 5) {
+            if (option < 0 || option > 5) {
                 System.out.println("Option inexistante");
                 continue;
             }
@@ -99,12 +99,20 @@ public class Etudiant {
                 case 5:
                     annulerCandidature();
                     break;
-
+                case 0:
+                    seDeconnecter();
+                    break;
             }
         }
 
     }
 
+    private void seDeconnecter() {
+        setIdEtudiant(null);
+        setSemestre(null);
+        setEmail(null);
+        this.start();
+    }
 
     private void connecterEtudiant() {
         boolean login = false;
@@ -285,7 +293,7 @@ public class Etudiant {
         return semestre;
     }
 
-    public void setIdEtudiant(int idEtudiant) {
+    public void setIdEtudiant(Integer idEtudiant) {
         this.idEtudiant = idEtudiant;
     }
 

@@ -74,6 +74,7 @@ public class Entreprise {
             System.out.println("5 - Voir les candidatures");
             System.out.println("6 - Selectionner un étudiant");
             System.out.println("7 - Annuler une offre de stage");
+            System.out.println("0 - Se déconnecter");
 
             try {
                 option = scanner.nextInt();
@@ -83,7 +84,7 @@ public class Entreprise {
                 System.out.println("Entrer un entier!");
                 continue;
             }
-            if (option < 1 || option > 7) {
+            if (option < 0 || option > 7) {
                 System.out.println("Option inexistante");
                 continue;
             }
@@ -103,9 +104,16 @@ public class Entreprise {
                     break;
                 case 7: annulerOffreStage();
                     break;
+                case 0: seDeconnecter();
+                    break;
             }
         }
 
+    }
+
+    public void seDeconnecter() {
+        setIdEntreprise(null);
+        this.start();
     }
 
     public void seConnecter() {
