@@ -10,12 +10,9 @@ public class Etudiant {
     private int idEtudiant;
 
     private Connection conn = null;
-    private PreparedStatement connecterEtudiant;
     private PreparedStatement visualiserOffresStageValides;
     private PreparedStatement rechercherOffreStageMotsCle;
     private PreparedStatement poserCandidature;
-
-    private PreparedStatement  getIdEtudiant;
 
     private PreparedStatement getOffresEtudiant;
     private PreparedStatement annulerCandidature;
@@ -33,24 +30,22 @@ public class Etudiant {
 
         String url="jdbc:postgresql://172.24.2.6:5432/dbtrongnguyen";
         //String url = "jdbc:postgresql://localhost:5432/postgres";
-        //login jsp
-        //mdp jsp
+        //login antoinedrionduchapoi
+        //mdp UPKBR1XQ7
         try {
-            conn = DriverManager.getConnection(url, "jasonchu", "JKWZUA2EF");
+            conn = DriverManager.getConnection(url, "antoinedrionduchapoi", "UPKBR1XQ7");
         } catch (SQLException e) {
             System.out.println("Impossible de joindre le server !");
             System.exit(1);
         }
 
         try {
-            connecterEtudiant = conn.prepareStatement("SELECT projet.connecter_etudiant (?,?)");
             visualiserOffresStageValides = conn.prepareStatement("SELECT * FROM projet.visualiser_offres_stage_valides (?) t(code VARCHAR(5), nom VARCHAR(100), adresse VARCHAR(100), description VARCHAR(1000), mots VARCHAR)");
             rechercherOffreStageMotsCle = conn.prepareStatement("SELECT * FROM projet.rechercher_offre_stage_mots_cle (?,?) t(code VARCHAR(5), nom VARCHAR(100), adresse VARCHAR(100), description VARCHAR(1000), mots VARCHAR)");
             poserCandidature = conn.prepareStatement("SELECT projet.poser_candidature (?,?,?)");
             getOffresEtudiant = conn.prepareStatement("SELECT * FROM projet.get_offres_etudiant(?) t(code VARCHAR(5), nom VARCHAR(100), etat VARCHAR(100))");
             annulerCandidature = conn.prepareStatement("SELECT projet.annuler_candidature(?,?)");
             recupererInfoEtudiant = conn.prepareStatement("SELECT * FROM projet.etudiants WHERE email=?");
-
         } catch (SQLException e) {
             System.out.println("Erreur !");
             System.exit(1);
@@ -246,7 +241,6 @@ public class Etudiant {
                         "\nCode: " + rs.getString(1) + "\n"
                         + "Entreprise: " + rs.getString(2) + "\n"
                         + "Etat candidature: " + rs.getString(3) + "\n"
-
                 );
             }
         } catch (SQLException throwables) {
@@ -265,7 +259,7 @@ public class Etudiant {
         String codeOffreStage;
 
 
-        System.out.println("Annuler une offre de stage");
+        System.out.println("Annuler une candidature");
         System.out.println("Code offre stage: ");
         codeOffreStage = scanner.nextLine();
 
