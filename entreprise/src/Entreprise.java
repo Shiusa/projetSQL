@@ -228,8 +228,6 @@ public class Entreprise {
 
         try(ResultSet rs = voirSesOffresStages.executeQuery()) {
             while (rs.next()) {
-                /*Array a = rs.getArray(1);
-                String[] result = (String[])a.getArray();*/
                 System.out.println(
                         "\nCode: " + rs.getString(1) + "\n"
                         +"Description: " + rs.getString(2) + "\n"

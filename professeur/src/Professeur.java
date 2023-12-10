@@ -6,8 +6,6 @@ public class Professeur {
 
     private Scanner scanner = new Scanner(System.in);
 
-    //private String salt = BCrypt.gensalt();
-
     private Connection conn = null;
     private PreparedStatement encoderEtudiant;
     private PreparedStatement encoderEntreprise;
@@ -113,7 +111,7 @@ public class Professeur {
 
         System.out.println("Encoder un étudiant");
         System.out.println("Nom: ");
-        //scanner.next();
+
         nom = scanner.nextLine();
         System.out.println("Prénom: ");
         prenom = scanner.nextLine();
@@ -123,8 +121,6 @@ public class Professeur {
         while (semestre == null) {
             try {
                 semestre = Semestre.valueOf(scanner.nextLine());
-                //System.out.println("semestre est "+semestre);
-                //semestreString = scanner.nextLine();
             } catch (IllegalArgumentException e) {
                 System.out.println("Semestre inexistant, entrer a nouveau le semestre");
                 System.out.println("Semestre (\"Q1\",\"Q2\"): ");
